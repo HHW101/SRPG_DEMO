@@ -6,51 +6,28 @@ using UnityEngine.UIElements;
 
 public class Grid : MonoBehaviour
 {
-    Node[,] grid;
-    [SerializeField] int length =25;
-    [SerializeField] int width =25;
-    [SerializeField] float cellSize =1f;
-
-    private void Start()
+    Tile[,] grid;
+    [SerializeField] private int GridX =10;
+    [SerializeField] private int GridY =10;
+    [SerializeField] private Tile tilePre;
+    private void Awake()
     {
-       GenerateGrid();
+        makeMap();
     }
 
-    private void GenerateGrid()
+    private void makeMap()
     {
-        grid = new Node[width, length];
-        CheckCanGoNode();
-    }
-    private void CheckCanGoNode()
-    {
-        for (int y = 0; y < length; y++)
+        Tile[,] grid = new Tile[GridX, GridY];
+        for (int i = 0; i < GridX; i++)
         {
-            for (int x = 0; x < width; x++)
+            for (int j = 0; j < GridY; j++)
             {
-                Vector3 pos = getWP(x, y);
-                int mask = 1 << LayerMask.NameToLayer("Obstacle");
-                bool CanGo=!Physics.CheckBox(pos, Vector3.one * cellSize / 2, quaternion.identity, mask);
-                grid[x, y] = new Node();
-                grid[x, y].canGo = CanGo;
+                grid[i, j] = Instantiate(tilePre, new Vector3(i*2, 0, j*2), Quaternion.Euler(new Vector3(90, 0, 0)));
+                grid[i, j].SetCoord(i, j);
             }
         }
     }
-    private Vector3 getWP(int x,int y)
-    {
-        return new Vector3(transform.position.x + x * cellSize, 0, transform.position.z + y * cellSize);
-    }
-    private void OnDrawGizmos()
-    {
-        if(grid == null) { return; }
-        for (int y = 0; y < length; y++)
-        {
-             for(int x = 0; x < width; x++)
-            {
-                Vector3 pos = getWP(x, y);
-                Gizmos.color = grid[x,y].canGo ? Color.white : Color.red;
-                Gizmos.DrawCube(pos, Vector3.one * 0.2f);
-            }
-        }
-    }
+
+
 
 }
