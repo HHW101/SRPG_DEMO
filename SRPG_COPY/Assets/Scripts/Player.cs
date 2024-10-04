@@ -1,51 +1,47 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 public class Player : MonoBehaviour
 {
     public int playerX{ get;set; }
     public int playerY{ get; set; }
-    private bool isMoving;
+    public bool isMoving;
     private Vector3 originPos, targetPos;
-    private float moveSpeed = 0.5f;
+    private float moveSpeed = 2f;
+    private Animator animator;
     // Start is called before the first frame update
+    private void Awake()
+    {
+        animator = GetComponent<Animator>();
+        animator.SetBool("isRunning", false);
+    }
     void Start()
     {
         
     }
-    public void GoTo(int x)
+    public void GoTo(Vector3 targetpostion)
     {
-        switch (x) { 
-        case 0:
-                StartCoroutine(MovePlayer(Vector3.forward*2));
-                break;
-        case 1:
-                StartCoroutine(MovePlayer(Vector3.back*2));
-                break;
-        case 2:
-                StartCoroutine(MovePlayer(Vector3.right*2));
-                break;
-        case 3:
-                StartCoroutine(MovePlayer(Vector3.left*2));
-                break;
-        
-        }
+       
+           StartCoroutine(MovePlayer(targetpostion));
+      
 
     }
     private IEnumerator MovePlayer(Vector3 direction)
     {
         isMoving = true;
-        float elapsedTime = 0;
-        originPos = transform.position;
-        targetPos = transform.position+direction;
-        while (elapsedTime < moveSpeed) {
-            
-            transform.position = Vector3.Lerp(originPos, targetPos, elapsedTime/moveSpeed);
-            elapsedTime += Time.deltaTime;
+        animator.SetBool("isRunning", true);
+        Vector3 rot = direction- transform.position;
+        transform.rotation = Quaternion.LookRotation(rot.normalized);
+        while (Vector3.Distance(transform.position, direction) > 0.01f)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, direction, moveSpeed * Time.deltaTime);
             yield return null;
         }
-        transform.position =targetPos;
+        transform.position=direction;
+        animator.SetBool("isRunning", false);
         isMoving = false;
     }
     // Update is called once per frame
@@ -53,5 +49,6 @@ public class Player : MonoBehaviour
     void Update()
     {
         
+
     }
 }

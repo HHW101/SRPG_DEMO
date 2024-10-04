@@ -70,40 +70,7 @@ private bool isRunning;
     }
     private void movePlayer()
     {
-        int pX = selectTile.getX()-player.playerX;
-        int pY = selectTile.getY()-player.playerY;
-        if (pX > 0)
-        {
-            for (int i = 0; i < pX; i++)
-            {
-                player.GoTo(2);
-                Debug.Log("우");
-            }
-        }
-        else
-        {
-            for (int i = 0; i < -pX; i++)
-            {
-                player.GoTo(3);
-                Debug.Log("좌");
-            }
-        }
-        if (pY > 0)
-        {
-            for (int i = 0; i < pY; i++)
-            {
-                player.GoTo(0);
-                Debug.Log("전진");
-            }
-        }
-        else
-        {
-            for (int i = 0; i < -pY; i++)
-            {
-                player.GoTo(1);
-                Debug.Log("후진");
-            }
-        }
+        player.GoTo(selectTile.transform.position);
         player.playerX=selectTile.getX();
         player.playerY=selectTile.getY();
 
@@ -132,7 +99,7 @@ private bool isRunning;
     {
         if (player == null)
         {
-            player = Instantiate(PlayerPre, new Vector3(x, 1, y), Quaternion.identity);
+            player = Instantiate(PlayerPre, new Vector3(x, 0.5f, y), Quaternion.identity);
         }
       
         player.playerX = 0;

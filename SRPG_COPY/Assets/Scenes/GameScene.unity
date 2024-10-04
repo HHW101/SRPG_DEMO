@@ -160,7 +160,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -410,8 +410,9 @@ MonoBehaviour:
   GridX: 10
   GridY: 10
   tilePre: {fileID: 4204972026169349626, guid: 5e94e347873d83d40b7d79b498ef5f53, type: 3}
-  PlayerPre: {fileID: 397768729186182120, guid: ed4b3c5af6fa7284d9fdbf7b5e50ac76,
+  PlayerPre: {fileID: 863427195390955492, guid: 4004c44e19a6d9947a60e5e5950e360f,
     type: 3}
+  speed: 2
 --- !u!4 &1900370201
 Transform:
   m_ObjectHideFlags: 0
