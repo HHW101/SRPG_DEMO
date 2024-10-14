@@ -12,6 +12,7 @@ public class Player : MonoBehaviour
     private Vector3 originPos, targetPos;
     private float moveSpeed = 2f;
     private Animator animator;
+    public Tile playerTIle;
     // Start is called before the first frame update
     private void Awake()
     {

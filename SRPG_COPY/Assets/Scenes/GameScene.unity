@@ -413,6 +413,7 @@ MonoBehaviour:
   PlayerPre: {fileID: 863427195390955492, guid: 4004c44e19a6d9947a60e5e5950e360f,
     type: 3}
   speed: 2
+  runAble: 3
 --- !u!4 &1900370201
 Transform:
   m_ObjectHideFlags: 0
