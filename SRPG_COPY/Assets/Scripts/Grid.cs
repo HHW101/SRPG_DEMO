@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using Unity.Mathematics;
+using Unity.VisualScripting;
 using UnityEditor.Search;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -15,7 +16,7 @@ public class Grid : MonoBehaviour
     [SerializeField] private Tile tilePre;
     [SerializeField] private Player PlayerPre;
     [SerializeField] private float speed=2.0f;
-    [SerializeField] private int runAble =3;
+    
     private Tile selectTile;
    
     private HashSet<Tile> goTiles = new HashSet<Tile>();
@@ -24,7 +25,16 @@ public class Grid : MonoBehaviour
     private int TileY;
     private bool isRunning;
     public static Grid instance;
-
+    
+    public void resetF()
+    {
+        foreach(var tile in grid)
+        {
+            tile.gCost = 0;
+            tile.hCost = 0;
+            tile.parent = null;
+        }
+    }
     private void Awake()
     {
         if(instance != null)
@@ -41,11 +51,32 @@ public class Grid : MonoBehaviour
     }
     private void Update()
     {
-        if (selectTile==null&&Input.anyKeyDown){
-            selectTile = grid[0 , 0];
+        switch (TurnManager.instance.turn)
+        {
+            case TurnManager.TurnState.pMoveTurn:
+                Moving();
+                break;
+            case TurnManager.TurnState.pAttackTurn:
+                Attack();
+                break;
+        }
+    }
+    public void initT()
+    {
+        
+    }
+    public void Attack()
+    {
+        HashSet<Tile> aRange=GetRange(selectTile.getX(),selectTile.getY(),player.range);
+
+    }
+    private void Moving()
+    {
+        if (selectTile == null && Input.anyKeyDown)
+        {
+            selectTile = grid[0, 0];
             selectTile.SetPState(Tile.PState.Select);
             ShowSetTile();
-            getCango(0, 0);
         }
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {
@@ -68,16 +99,25 @@ public class Grid : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.DownArrow))
         {
             if (selectTile.getY() > 0)
-               ShiftSelect(0,-1);
-            
+                ShiftSelect(0, -1);
+
             ShowSetTile();
         }
-        if (Input.GetKeyDown(KeyCode.Z)) {
-            isRunning = true;
-            ClickTile();
-        
+        if (Input.GetKeyDown(KeyCode.Z))
+        {
+            if (!isRunning)
+            {
+                selectTile.SetPState(Tile.PState.Select);
+                //getCango(selectTile.getX(), selectTile.getY());
+                player.GetRange(UnitP.mode.move);
+                isRunning = true;
+            }
+            else
+            {
+                ClickTile();
+                isRunning = false;
+            }
         }
-
     }
     public void ShiftSelect(int x,int y)
     {
@@ -91,44 +131,48 @@ public class Grid : MonoBehaviour
         selectTile = grid[selectTile.getX()+x, selectTile.getY() + y];
         selectTile.SetPState(Tile.PState.Select);
     }
-    public void getCango(int x,int y)
+    public HashSet<Tile> GetRange(int x, int y, int cnt)
     {
-        int cnt = runAble;
+        HashSet<Tile> range = new HashSet<Tile>();
+        
+        range.Add(getTile(x, y));
+
+        for (int dx = -cnt; dx <= cnt; dx++)
+        {
+            for (int dy = -cnt; dy <= cnt; dy++)
+            {
+                if (math.abs(dx) + math.abs(dy) <= cnt)
+                    if (getTile(x + dx, y + dy) != null)
+                        range.Add(getTile(x + dx, y + dy));
+
+            }
+        }
+        return range;
+    }
+    public void setGo(HashSet<Tile> tiles)
+    {
         if (goTiles != null)
         {
             foreach (Tile t in goTiles)
             {
-                if(t!=null)
-                t.SetPState(Tile.PState.Idle);
+                if (t != null)
+                    t.SetPState(Tile.PState.Idle);
             }
         }
         goTiles.Clear();
-       
-        goTiles.Add(getTile(x, y));
-       
-        for(int dx=-cnt;dx<=cnt; dx++)
-        {
-            for(int dy=-cnt;dy<=cnt; dy++)
-            {
-                if (math.abs(dx) + math.abs(dy) <= cnt) 
-                if (getTile(x+dx,y+dy) != null)
-                    goTiles.Add(getTile(x+dx,y+ dy));
-                
-            }
-        }
-        
+        goTiles = tiles;
         if (goTiles != null)
         {
             foreach (Tile t in goTiles)
             {
-        
+
                 if (t != null)
                     t.SetPState(Tile.PState.CanGO);
             }
         }
-        
-
+        selectTile.SetPState(Tile.PState.Select);
     }
+ 
     private void Cango(int x,int y,int cnt)
     {
         if (cnt == 0) return;
@@ -154,18 +198,30 @@ public class Grid : MonoBehaviour
     private void ClickTile()
     {
         movePlayer();
-        getCango(selectTile.getX(),selectTile.getY());
+        TurnManager.instance.TurnChange(TurnManager.TurnState.enemyTurn);
+        if (goTiles != null)
+        {
+            foreach (Tile t in goTiles)
+            {
+                if (t != null)
+                    t.SetPState(Tile.PState.Idle);
+            }
+        }
+        goTiles.Clear();
 
         //StartCoroutine(MovePlayer(selectTile.getX(), selectTile.getY()));
     }
     private void movePlayer()
     {
-        player.GoTo(selectTile.transform.position);
+        //player.GoTo(selectTile.transform.position);
         Pathfinder path = new Pathfinder();
-        //path.FindNext(player.playerTIle, selectTile);
-        player.playerX=selectTile.getX();
-        player.playerY=selectTile.getY();
-
+        List<Tile> temp = new List<Tile>();    
+        temp=path.FindNext(player.unitTIle, selectTile);
+        if (temp != null)
+            player.GoTo(temp);
+        player.unitX=selectTile.getX();
+        player.unitY=selectTile.getY();
+       
 
     }
     public Tile getTile(int x, int y)
@@ -204,7 +260,7 @@ public class Grid : MonoBehaviour
       
         player.playerX = 0;
         player.playerY = 0;
-        player.playerTIle = grid[x, y];
+        player.unitTIle = grid[x, y];
         grid[x,y].Setstate(Tile.TileState.Occupied);
 
     }

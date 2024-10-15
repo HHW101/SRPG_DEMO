@@ -14,6 +14,7 @@ public class Tile : MonoBehaviour
     public GameObject selectTilePre;
     private GameObject goTile;
     public GameObject goTilePre;
+    public Tile parent;
     public int fCost { get {  return gCost+hCost; } }
      public enum TileState
     {

@@ -129,7 +129,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 279f9046be85b3648af6076b7e24d489, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hp: 10
+  range: 2
   isMoving: 0
+  runAble: 8
+  unitX: 0
+  unitY: 0
+  playerTIle: {fileID: 0}
 --- !u!54 &4388494209124259611
 Rigidbody:
   m_ObjectHideFlags: 0

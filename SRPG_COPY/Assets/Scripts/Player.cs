@@ -4,52 +4,49 @@ using TMPro;
 using UnityEngine;
 using static UnityEngine.GraphicsBuffer;
 
-public class Player : MonoBehaviour
+public class Player : UnitP
 {
     public int playerX{ get;set; }
     public int playerY{ get; set; }
-    public bool isMoving;
+
     private Vector3 originPos, targetPos;
-    private float moveSpeed = 2f;
-    private Animator animator;
-    public Tile playerTIle;
+  
+    
     // Start is called before the first frame update
-    private void Awake()
+    protected override void Awake()
     {
-        animator = GetComponent<Animator>();
-        animator.SetBool("isRunning", false);
+        base.Awake();
     }
     void Start()
     {
         
     }
-    public void GoTo(Vector3 targetpostion)
+    public override void Attack()
     {
-       
-           StartCoroutine(MovePlayer(targetpostion));
+        base.Attack();
+    }
+    public override void Damaged(float x)
+    {
+        base.Damaged(x);  
+    }
+    public override void GoTo(Vector3 targetpostion)
+    {
+        base.GoTo(targetpostion);
       
 
     }
-    private IEnumerator MovePlayer(Vector3 direction)
+    
+    public override void GetRange(mode s)
     {
-        isMoving = true;
-        animator.SetBool("isRunning", true);
-        Vector3 rot = direction- transform.position;
-        transform.rotation = Quaternion.LookRotation(rot.normalized);
-        while (Vector3.Distance(transform.position, direction) > 0.01f)
-        {
-            transform.position = Vector3.MoveTowards(transform.position, direction, moveSpeed * Time.deltaTime);
-            yield return null;
-        }
-        transform.position=direction;
-        animator.SetBool("isRunning", false);
-        isMoving = false;
+        base.GetRange(s);
+        Grid.instance.setGo(RangeTiles);
     }
+
     // Update is called once per frame
 
     void Update()
     {
-        
+       
 
     }
 }

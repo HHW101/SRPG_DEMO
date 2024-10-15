@@ -388,6 +388,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1900370201}
   - component: {fileID: 1900370200}
+  - component: {fileID: 1900370202}
   m_Layer: 0
   m_Name: MapManager
   m_TagString: Untagged
@@ -407,13 +408,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abb8f1c54695f1545af46a4b08a7598c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GridX: 10
-  GridY: 10
+  GridX: 20
+  GridY: 20
   tilePre: {fileID: 4204972026169349626, guid: 5e94e347873d83d40b7d79b498ef5f53, type: 3}
   PlayerPre: {fileID: 863427195390955492, guid: 4004c44e19a6d9947a60e5e5950e360f,
     type: 3}
   speed: 2
-  runAble: 3
+  runAble: 5
 --- !u!4 &1900370201
 Transform:
   m_ObjectHideFlags: 0
@@ -429,6 +430,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1900370202
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1900370199}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de38b8b76a2ba5d4883cc4a0b2b105df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  turn: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
