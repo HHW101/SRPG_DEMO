@@ -413,8 +413,20 @@ MonoBehaviour:
   tilePre: {fileID: 4204972026169349626, guid: 5e94e347873d83d40b7d79b498ef5f53, type: 3}
   PlayerPre: {fileID: 863427195390955492, guid: 4004c44e19a6d9947a60e5e5950e360f,
     type: 3}
+  MonsterPre: {fileID: 7601691914486981240, guid: c6cfc32748fb5004aa11a1be074b5c58,
+    type: 3}
   speed: 2
-  runAble: 5
+  monspawnPos:
+  - {x: 2, y: 3}
+  - {x: 4, y: 12}
+  - {x: 8, y: 6}
+  obspawnPos:
+  - {x: 3, y: 5}
+  - {x: 1, y: 4}
+  - {x: 5, y: 3}
+  - {x: 2, y: 7}
+  - {x: 2, y: 1}
+  obspre: {fileID: 1375754531036840, guid: 71497ec4178769a4c8cdb38563f01fc0, type: 3}
 --- !u!4 &1900370201
 Transform:
   m_ObjectHideFlags: 0

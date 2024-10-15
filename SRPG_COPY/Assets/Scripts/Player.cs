@@ -21,9 +21,10 @@ public class Player : UnitP
     {
         
     }
-    public override void Attack()
+    public override void Attack(GameObject a)
     {
-        base.Attack();
+        base.Attack(a);
+        Debug.Log($"플레이어가 {a}를 공격");
     }
     public override void Damaged(float x)
     {
@@ -46,7 +47,6 @@ public class Player : UnitP
 
     void Update()
     {
-       
 
     }
 }

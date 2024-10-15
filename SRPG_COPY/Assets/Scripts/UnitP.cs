@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 /* 유닛들을 조작하는 가상 클래스
  *  모든 유닛이 공유하는 움직임을 줌
@@ -20,6 +21,30 @@ public class UnitP : MonoBehaviour
     public int unitY;
     protected HashSet<Tile> RangeTiles = new HashSet<Tile>();
     public Tile unitTIle;
+    public enum Direction
+    {
+        up, down, left, right
+    }
+    public void SetDirection(Direction direction)
+    {
+        switch (direction)
+        {
+            case Direction.up:
+                transform.rotation = Quaternion.Euler(0, 0, 0);  
+                break;
+            case Direction.down:
+                transform.rotation = Quaternion.Euler(0, 180, 0);  
+                break;
+            case Direction.left:
+                transform.rotation = Quaternion.Euler(0, 270, 0);  
+                break;
+            case Direction.right:
+                transform.rotation = Quaternion.Euler(0, 90, 0);  
+                break;
+           
+                    
+        }
+    }
     public enum mode
     {
         attack,move
@@ -31,9 +56,9 @@ public class UnitP : MonoBehaviour
         animator.SetBool("isRunning", false);
     }
 
-    public virtual void Attack()
+    public virtual void Attack(GameObject a)
     {
-        GetRange(mode.attack);
+       // GetRange(mode.attack);
     }
     public virtual void Damaged(float x)
     {
@@ -103,9 +128,11 @@ public class UnitP : MonoBehaviour
         animator.SetBool("isRunning", false);
         isMoving = false;
             unitTIle = tile;
+            
         }
-       
-        
+
+        unitTIle.state = Tile.TileState.Occupied;
+        unitTIle.on = gameObject;
 }
     // Update is called once per frame
     

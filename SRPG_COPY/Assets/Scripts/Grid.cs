@@ -15,12 +15,16 @@ public class Grid : MonoBehaviour
     [SerializeField] private int GridY =10;
     [SerializeField] private Tile tilePre;
     [SerializeField] private Player PlayerPre;
+    [SerializeField] private Monster MonsterPre;
     [SerializeField] private float speed=2.0f;
-    
+    [SerializeField] private Vector2[] monspawnPos = new Vector2[5];
+    [SerializeField] private Vector2[] obspawnPos = new Vector2[5];
+    [SerializeField] private GameObject obspre;
     private Tile selectTile;
    
     private HashSet<Tile> goTiles = new HashSet<Tile>();
     private Player player;
+    private Monster[] monster=new Monster[3];
     private int TileX;
     private int TileY;
     private bool isRunning;
@@ -47,6 +51,7 @@ public class Grid : MonoBehaviour
         grid = new Tile[GridX, GridY];
         makeMap();
         SetPlayer(0,0);
+        SetMonster();
         
     }
     private void Update()
@@ -61,14 +66,51 @@ public class Grid : MonoBehaviour
                 break;
         }
     }
-    public void initT()
-    {
-        
-    }
+
     public void Attack()
     {
-        HashSet<Tile> aRange=GetRange(selectTile.getX(),selectTile.getY(),player.range);
+        
+        if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            if (selectTile.getX() < GridX - 1)
+                ShiftSelect(1, 0);
+            ShowSetTile();
+        }
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            if (selectTile.getX() > 0)
+                ShiftSelect(-1, 0);
+            ShowSetTile();
+        }
+        if (Input.GetKeyDown(KeyCode.UpArrow))
+        {
+            if (selectTile.getY() < GridY - 1)
+                ShiftSelect(0, 1);
+            ShowSetTile();
+        }
+        if (Input.GetKeyDown(KeyCode.DownArrow))
+        {
+            if (selectTile.getY() > 0)
+                ShiftSelect(0, -1);
 
+            ShowSetTile();
+        }
+        if (Input.GetKeyDown(KeyCode.Z))
+        {
+            if (!isRunning)
+            {
+                selectTile.SetPState(Tile.PState.Select);
+            
+                player.GetRange(UnitP.mode.attack);
+                isRunning = true;
+            }
+            else if(selectTile.state==Tile.TileState.Occupied)
+            {
+                player.Attack(selectTile.on);
+                isRunning = false;
+            }
+        }
+      
     }
     private void Moving()
     {
@@ -198,7 +240,7 @@ public class Grid : MonoBehaviour
     private void ClickTile()
     {
         movePlayer();
-        TurnManager.instance.TurnChange(TurnManager.TurnState.enemyTurn);
+        TurnManager.instance.TurnChange(TurnManager.TurnState.pAttackTurn);
         if (goTiles != null)
         {
             foreach (Tile t in goTiles)
@@ -208,6 +250,7 @@ public class Grid : MonoBehaviour
             }
         }
         goTiles.Clear();
+
 
         //StartCoroutine(MovePlayer(selectTile.getX(), selectTile.getY()));
     }
@@ -228,7 +271,8 @@ public class Grid : MonoBehaviour
     {
         if(x< 0 || y < 0||x>=GridX||y>=GridY) return null;
         if (grid[x, y] == null) return null;
-        //if (grid[x,y].Getstate()!=Tile.TileState.Idle) return null;
+        if (grid[x,y].Getstate()!=Tile.TileState.Idle&&TurnManager.instance.turn!=TurnManager.TurnState.pAttackTurn) return null;
+        if (grid[x,y].Getstate()==Tile.TileState.Block) return null;
         return grid[x, y];
     }
    
@@ -244,10 +288,16 @@ public class Grid : MonoBehaviour
         {
             for (int j = 0; j < GridY; j++)
             {
+                
                 grid[i, j] = Instantiate(tilePre, new Vector3(i*2, 0, j*2), Quaternion.Euler(new Vector3(90, 0, 0)));
                 grid[i, j].SetCoord(i, j);
                 Debug.Log(i+"확인"+j+grid[i, j]);
             }
+        }
+        foreach(Vector2 i in obspawnPos)
+        {
+            grid[(int)i.x,(int)i.y].Setstate(Tile.TileState.Block);
+            Instantiate(obspre, grid[(int)i.x, (int)i.y].gameObject.transform.position + new Vector3(0, 0.1f, 0),quaternion.identity);
         }
     }
 
@@ -255,16 +305,36 @@ public class Grid : MonoBehaviour
     {
         if (player == null)
         {
-            player = Instantiate(PlayerPre, new Vector3(x, 0.5f, y), Quaternion.identity);
+            player = Instantiate(PlayerPre, new Vector3(x * 2, 0.5f, y * 2), Quaternion.identity);
         }
       
         player.playerX = 0;
         player.playerY = 0;
         player.unitTIle = grid[x, y];
         grid[x,y].Setstate(Tile.TileState.Occupied);
+        grid[x,y].on = player.gameObject;
 
     }
-
+    public void SetMonster()
+    {
+        
+        for (int i = 0; i < monspawnPos.Length; i++)
+        {
+            
+            int x = (int)monspawnPos[i].x;
+            int y = (int)monspawnPos[i].y;
+            monster[i] = Instantiate(MonsterPre, new Vector3(x*2, 0.5f, y*2), Quaternion.identity);
+            monster[i].unitTIle = grid[x, y];
+            grid[x, y].Setstate(Tile.TileState.Occupied);
+            grid[x, y].on = monster[i].gameObject;
+            if (x > y)
+                monster[i].SetDirection(Monster.Direction.left);
+            else
+                monster[i].SetDirection(Monster.Direction.down);
+        }
+       
+    }
+  
 
 
 }

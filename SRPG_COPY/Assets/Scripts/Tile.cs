@@ -15,6 +15,7 @@ public class Tile : MonoBehaviour
     private GameObject goTile;
     public GameObject goTilePre;
     public Tile parent;
+    public GameObject on;
     public int fCost { get {  return gCost+hCost; } }
      public enum TileState
     {
@@ -22,6 +23,11 @@ public class Tile : MonoBehaviour
         Block,
         Occupied
 
+    }
+    void Update()
+    {
+        if (state != TileState.Occupied)
+            on = null;
     }
     public enum PState
     {

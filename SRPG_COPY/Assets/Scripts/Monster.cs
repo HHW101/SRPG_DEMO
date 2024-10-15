@@ -23,9 +23,9 @@ public class Monster : UnitP
     {
         
     }
-    public override void Attack()
+    public override void Attack(GameObject a)
     {
-        base.Attack();
+        base.Attack(a);
     }
     public override void Damaged(float x)
     {
