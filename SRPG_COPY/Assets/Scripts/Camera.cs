@@ -4,22 +4,38 @@ using UnityEngine;
 
 public class Camera : MonoBehaviour
 {
-    public Transform Target;
+    public GameObject Target;
     public float offsetX;
     public float offsetY;
     public float offsetZ;
     // Start is called before the first frame update
     void Start()
     {
-        Target = Grid.instance.FIndPlayer().gameObject.transform;
+        Target = Grid.instance.FIndPlayer().gameObject;
     }
 
     // Update is called once per frame
- 
+    public void ZoomIn()
+    {
+        offsetX = offsetX / 2;
+        offsetY=offsetY/2;
+        offsetZ = offsetZ / 2;
+    }
+    public void ZoomOut()
+    {
+        offsetX = offsetX * 2;
+        offsetY=offsetY*2;
+        offsetZ = offsetZ * 2;
+    }
+    public void ChangeTarget(GameObject t)
+    {
+        Target = t;
+    }
     private void FixedUpdate()
     {
+        
         transform.position=
-            new Vector3(Target.position.x+offsetX, Target.position.y+offsetY, Target.position.z+offsetZ);
+            new Vector3(Target.transform.position.x+offsetX, Target.transform.position.y+offsetY, Target.transform.position.z+offsetZ);
         
     }
 }

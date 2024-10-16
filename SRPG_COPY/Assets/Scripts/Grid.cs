@@ -22,7 +22,7 @@ public class Grid : MonoBehaviour
     [SerializeField] private Vector2[] obspawnPos = new Vector2[5];
     [SerializeField] private GameObject obspre;
     private Tile selectTile;
-   
+    public Camera cam;
     private HashSet<Tile> goTiles = new HashSet<Tile>();
     private Player player;
     private Monster[] monster=new Monster[3];
@@ -62,6 +62,7 @@ public class Grid : MonoBehaviour
         switch (TurnManager.instance.turn)
         {
             case TurnManager.TurnState.pMoveTurn:
+                Grid.instance.cam.ChangeTarget(player.gameObject);
                 Moving();
                 break;
             case TurnManager.TurnState.pAttackTurn:

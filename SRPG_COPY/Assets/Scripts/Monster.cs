@@ -48,6 +48,8 @@ public class Monster : UnitP
     }
     public void Findplayer()
     {
+        Grid.instance.cam.ChangeTarget(gameObject);
+        Grid.instance.cam.ZoomIn();
         Pathfinder path = new Pathfinder();
         List<Tile> temp = new List<Tile>();
         temp = path.FindNext(Grid.instance.FIndPlayer().unitTIle, unitTIle);
@@ -58,6 +60,7 @@ public class Monster : UnitP
             GoTo(temp);
         unitX = unitTIle.getX();
         unitY = unitTIle.getY();
+        Grid.instance.cam.ZoomOut();
     }
     // Update is called once per frame
     void Update()

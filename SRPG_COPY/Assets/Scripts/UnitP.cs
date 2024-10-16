@@ -110,6 +110,7 @@ public class UnitP : MonoBehaviour
 
     private IEnumerator MovePlayer(List<Tile> t)
     {
+        Grid.instance.cam.ZoomIn();
         foreach (Tile tile in t)
         {
             Debug.Log($"tile: X = {tile.getX()}, Y = {tile.getY()}");
@@ -133,7 +134,8 @@ public class UnitP : MonoBehaviour
 
         unitTIle.state = Tile.TileState.Occupied;
         unitTIle.on = gameObject;
-}
+        Grid.instance.cam.ZoomOut();
+    }
     // Update is called once per frame
     
 }
