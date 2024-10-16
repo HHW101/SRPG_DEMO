@@ -49,11 +49,11 @@ public class Monster : UnitP
     }
     public void Findplayer()
     {
-        Grid.instance.cam.ChangeTarget(gameObject);
-        Grid.instance.cam.ZoomIn();
+        GameManager.instance.cam.ChangeTarget(gameObject);
+        GameManager.instance.cam.ZoomIn();
         Pathfinder path = new Pathfinder();
         List<Tile> temp = new List<Tile>();
-        temp = path.FindNext(unitTIle, Grid.instance.FIndPlayer().unitTIle);
+        temp = path.FindNext(unitTIle, GameManager.instance.FIndPlayer().unitTIle);
         Debug.Log(temp.Count);
         foreach (Tile tile in temp) { Debug.Log(tile+"아니 아게 맞나"); }
         if(temp.Count>runAble)
@@ -63,7 +63,7 @@ public class Monster : UnitP
             GoTo(temp);
         unitX = unitTIle.getX();
         unitY = unitTIle.getY();
-        Grid.instance.cam.ZoomOut();
+        GameManager.instance.cam.ZoomOut();
     }
     // Update is called once per frame
     void Update()

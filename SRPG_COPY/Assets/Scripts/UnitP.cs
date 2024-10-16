@@ -56,6 +56,9 @@ public class UnitP : MonoBehaviour
     {
         animator = GetComponent<Animator>();
         animator.SetBool("isRunning", false);
+        animator.SetBool("isHit", false);
+        animator.SetBool("isDie", false);
+        animator.SetBool("isAttack", false);
     }
 
     public virtual void Attack(GameObject a)
@@ -82,10 +85,10 @@ public class UnitP : MonoBehaviour
     {
         switch (s) {
             case mode.attack:
-                RangeTiles = Grid.instance.GetRange(unitX, unitY, range);
+                RangeTiles = GameManager.instance.GetRange(unitX, unitY, range);
                 break;
             case mode.move:
-                RangeTiles = Grid.instance.GetRange(unitX, unitY, runAble);
+                RangeTiles = GameManager.instance.GetRange(unitX, unitY, runAble);
                 break;
         }
 
@@ -112,7 +115,7 @@ public class UnitP : MonoBehaviour
 
     private IEnumerator MovePlayer(List<Tile> t)
     {
-        Grid.instance.cam.ZoomIn();
+        GameManager.instance.cam.ZoomIn();
         foreach (Tile tile in t)
         {
             Debug.Log($"tile: X = {tile.getX()}, Y = {tile.getY()}");
@@ -137,9 +140,9 @@ public class UnitP : MonoBehaviour
         unitTIle.state = Tile.TileState.Occupied;
         unitTIle.on = gameObject;
         CheckDir();
-        Grid.instance.cam.ZoomOut();
+        GameManager.instance.cam.ZoomOut();
         if(TurnManager.instance.turn!=TurnManager.TurnState.enemyTurn)
-            Grid.instance.canClick = true;
+            GameManager.instance.canClick = true;
     }
     private void CheckDir()
     {

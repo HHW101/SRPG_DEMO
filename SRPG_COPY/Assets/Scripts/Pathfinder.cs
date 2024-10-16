@@ -5,23 +5,68 @@ using UnityEngine;
 public class Pathfinder 
 {
 
-    [SerializeField]
-    public Tile startTile;
-    public Tile endTile;
+  
 
     // Start is called before the first frame update
     void Start()
     {
         
     }
-    //배열 뒤집는 연산 하기 아까우니까 처음부터 역으로 계산하려 했는데 이럼 안 될 수도 있음 그런 경우: 길을 찾고 전부 이동하는 게 아닐 수도 있다.  
-   
+    //BFS 사용
+   public HashSet<Tile> Range(Tile startTile,int cnt)
+    {
+
+        Tile currentTIle = startTile;
+        Queue<Tile> openTiles = new Queue<Tile>();
+        HashSet<Tile> closedTiles = new HashSet<Tile>();
+        GameManager.instance.resetF();
+        openTiles.Enqueue(currentTIle);
+        Debug.Log(currentTIle);
+        currentTIle.gCost = 0;
+        int[] dx = { 0, 0, 1, -1 };
+        int[] dy = { 1, -1, 0, 0 };
+        while (openTiles.Count > 0)
+        {
+            currentTIle = openTiles.Dequeue();
+            closedTiles.Add(currentTIle);
+            if (currentTIle.gCost ==cnt) { continue; }
+            for (int i = 0; i < 4; i++)
+            {
+                if (currentTIle.getDir(i))
+                    continue;
+                Tile tempTIle = GameManager.instance.getTile(currentTIle.getX() + dx[i], currentTIle.getY() + dy[i]);
+               
+                //g를 cnt 대용으로 씀
+                if (tempTIle != null && !closedTiles.Contains(tempTIle))
+                {
+                    if (tempTIle.state == Tile.TileState.Occupied)
+                    {
+                        Debug.Log("체크");
+                        continue;
+                    }
+                    if (!openTiles.Contains(tempTIle) || currentTIle.gCost + 1 < tempTIle.gCost) //cnt가 더 짧을 때
+                    {
+                        tempTIle.gCost = currentTIle.gCost + 1;    //교체한다! 
+                        if (!openTiles.Contains(tempTIle))
+                            openTiles.Enqueue(tempTIle);
+
+                    }
+
+                }
+
+
+            }
+           
+        }
+        GameManager.instance.resetF();
+        return closedTiles;
+    }
     public List<Tile> FindNext(Tile startTile, Tile endTile)
     {
         Tile currentTIle=startTile;
         List<Tile> openTiles = new List<Tile>();
         HashSet<Tile> closedTiles = new HashSet<Tile>();
-        Grid.instance.resetF();
+        GameManager.instance.resetF();
        openTiles.Add(currentTIle);
         int[] dx = { 0, 0, 1, -1 }; 
         int[] dy = { 1, -1, 0, 0 }; 
@@ -33,7 +78,7 @@ public class Pathfinder
             {
                 if (currentTIle.getDir(i))
                     continue;
-                Tile tempTIle = Grid.instance.getTile(currentTIle.getX() + dx[i], currentTIle.getY() + dy[i]);
+                Tile tempTIle = GameManager.instance.getTile(currentTIle.getX() + dx[i], currentTIle.getY() + dy[i]);
                
               if (tempTIle != null && !closedTiles.Contains(tempTIle))
                     {
@@ -111,7 +156,7 @@ public class Pathfinder
             currentTIle= currentTIle.parent;
         }
         route.Reverse();
-        Grid.instance.resetF();
+        GameManager.instance.resetF();
         if(closedTiles.Contains(endTile))
             return route;
        return null;

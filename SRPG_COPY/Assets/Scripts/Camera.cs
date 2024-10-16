@@ -11,7 +11,7 @@ public class Camera : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Target = Grid.instance.FIndPlayer().gameObject;
+        Target = GameManager.instance.FIndPlayer().gameObject;
     }
 
     // Update is called once per frame

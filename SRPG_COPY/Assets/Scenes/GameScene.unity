@@ -5146,6 +5146,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Floor_Plain_Parent (16)
       objectReference: {fileID: 0}
+    - target: {fileID: 7316950387151465825, guid: 3964c23ae9838e84889ea6d65b5861aa,
+        type: 3}
+      propertyPath: leftB
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8460917321318470221, guid: 3964c23ae9838e84889ea6d65b5861aa,
         type: 3}
       propertyPath: m_RootOrder
@@ -13769,6 +13774,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2139885701}
     m_Modifications:
+    - target: {fileID: -5596302089551578697, guid: 46213ca8f32bf1142a1a90d5a66e459d,
+        type: 3}
+      propertyPath: rightB
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4043159223674625595, guid: 46213ca8f32bf1142a1a90d5a66e459d,
         type: 3}
       propertyPath: m_Name

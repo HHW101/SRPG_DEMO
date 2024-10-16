@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using static UnityEngine.GraphicsBuffer;
 
-public class Grid : MonoBehaviour
+public class GameManager : MonoBehaviour
 {
     
     [SerializeField] private Tile[,] grid;
@@ -30,8 +30,10 @@ public class Grid : MonoBehaviour
     private int TileX;
     private int TileY;
     private bool isRunning;
-    public static Grid instance;
-   
+    public static GameManager instance;
+    Pathfinder path;
+
+
     public void resetF()
     {
         foreach(var tile in grid)
@@ -56,7 +58,7 @@ public class Grid : MonoBehaviour
         makeMap();
         SetPlayer(0,2);
         SetMonster();
-        
+        path = new Pathfinder();
     }
     private void Update()
     {
@@ -65,7 +67,8 @@ public class Grid : MonoBehaviour
         switch (TurnManager.instance.turn)
         {
             case TurnManager.TurnState.pMoveTurn:
-                Grid.instance.cam.ChangeTarget(player.gameObject);
+                
+                GameManager.instance.cam.ChangeTarget(player.gameObject);
                 Moving();
                 
                 break;
@@ -189,19 +192,20 @@ public class Grid : MonoBehaviour
     public HashSet<Tile> GetRange(int x, int y, int cnt)
     {
         HashSet<Tile> range = new HashSet<Tile>();
-        
-        range.Add(getTile(x, y));
+        Debug.Log($"{x}:{y}{getTile(x, y)}");
+        range= path.Range(getTile(x,y), cnt);
+        //range.Add(getTile(x, y));
 
-        for (int dx = -cnt; dx <= cnt; dx++)
-        {
-            for (int dy = -cnt; dy <= cnt; dy++)
-            {
-                if (math.abs(dx) + math.abs(dy) <= cnt)
-                    if (getTile(x + dx, y + dy) != null)
-                        range.Add(getTile(x + dx, y + dy));
+        //for (int dx = -cnt; dx <= cnt; dx++)
+        //{
+        //    for (int dy = -cnt; dy <= cnt; dy++)
+        //    {
+        //        if (math.abs(dx) + math.abs(dy) <= cnt)
+        //            if (getTile(x + dx, y + dy) != null)
+        //                range.Add(getTile(x + dx, y + dy));
 
-            }
-        }
+        //    }
+        //}
         return range;
     }
     public void setGo(HashSet<Tile> tiles)
@@ -270,7 +274,7 @@ public class Grid : MonoBehaviour
     private void movePlayer()
     {
         //player.GoTo(selectTile.transform.position);
-        Pathfinder path = new Pathfinder();
+        
         List<Tile> temp = new List<Tile>();    
         temp=path.FindNext(player.unitTIle, selectTile);
         if (temp != null)
@@ -285,9 +289,11 @@ public class Grid : MonoBehaviour
         if(x< 0 || y < 0||x>=GridX||y>=GridY) return null;
        
         if (grid[x, y] == null) return null;
-      
+
         //if (grid[x,y].Getstate()!=Tile.TileState.Idle&&TurnManager.instance.turn!=TurnManager.TurnState.pAttackTurn) return null;
-        if (grid[x,y].Getstate()==Tile.TileState.Block) return null;
+        if (grid[x, y].Getstate() == Tile.TileState.Block) {
+            Debug.Log(x + " "+y);
+            return null; }
         return grid[x, y];
     }
    
@@ -345,8 +351,8 @@ public class Grid : MonoBehaviour
             player = Instantiate(PlayerPre, new Vector3(x * 4, 0.2f, y * 4), Quaternion.identity);
         }
       
-        player.playerX = 0;
-        player.playerY = 0;
+        player.unitX = x; player.unitY = y;
+        
         player.unitTIle = grid[x, y];
         grid[x,y].Setstate(Tile.TileState.Occupied);
         grid[x,y].on = player.gameObject;
@@ -370,6 +376,8 @@ public class Grid : MonoBehaviour
             grid[x, y].Setstate(Tile.TileState.Occupied);
             grid[x, y].on = monster[i].gameObject;
             monster[i].monsterNum = i;
+            monster[i].unitX = x;
+            monster[i].unitY = y;
             if (x > y)
                 monster[i].SetDirection(Monster.Direction.left);
             else

@@ -41,7 +41,7 @@ public class Player : UnitP
     public override void GetRange(mode s)
     {
         base.GetRange(s);
-        Grid.instance.setGo(RangeTiles);
+        GameManager.instance.setGo(RangeTiles);
     }
 
     // Update is called once per frame

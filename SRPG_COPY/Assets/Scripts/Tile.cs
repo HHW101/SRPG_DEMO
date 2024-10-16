@@ -61,7 +61,7 @@ public class Tile : MonoBehaviour
         Select
 
     }
-    public TileState state;
+    public TileState state =TileState.Idle;
     public PState pState;
     public void SetCoord(int x, int y)
     {
@@ -71,7 +71,7 @@ public class Tile : MonoBehaviour
         goTile.SetActive(false);
         selectTile = Instantiate(selectTilePre, gameObject.transform.position + new Vector3(0, 0.1f, 0), Quaternion.Euler(new Vector3(90, 0, 0)));
         selectTile.SetActive(false);
-        Setstate(TileState.Idle);
+        //Setstate(TileState.Idle);
     }
     public void SetPState(PState _pState)
     {
