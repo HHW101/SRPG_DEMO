@@ -54,7 +54,7 @@ public class Grid : MonoBehaviour
         isRunning = false;
         grid = new Tile[GridX, GridY];
         makeMap();
-        SetPlayer(0,1);
+        SetPlayer(0,2);
         SetMonster();
         
     }
@@ -342,7 +342,7 @@ public class Grid : MonoBehaviour
     {
         if (player == null)
         {
-            player = Instantiate(PlayerPre, new Vector3(x * 2, 0.2f, y * 2), Quaternion.identity);
+            player = Instantiate(PlayerPre, new Vector3(x * 4, 0.2f, y * 4), Quaternion.identity);
         }
       
         player.playerX = 0;

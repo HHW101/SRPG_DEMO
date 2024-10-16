@@ -312,7 +312,7 @@ PrefabInstance:
     - target: {fileID: 336162413012652169, guid: 5f1cf3fcc1acb1b4eb479d3826dfde11,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 4.41
       objectReference: {fileID: 0}
     - target: {fileID: 336162413012652169, guid: 5f1cf3fcc1acb1b4eb479d3826dfde11,
         type: 3}
@@ -1003,7 +1003,7 @@ PrefabInstance:
     - target: {fileID: 6063327808818567580, guid: 729deec6e080cfa469aea735d7c78644,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -13
+      value: -10.95
       objectReference: {fileID: 0}
     - target: {fileID: 6063327808818567580, guid: 729deec6e080cfa469aea735d7c78644,
         type: 3}
@@ -6878,7 +6878,7 @@ PrefabInstance:
     - target: {fileID: 6063327808818567580, guid: 729deec6e080cfa469aea735d7c78644,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1
+      value: -1.1500018
       objectReference: {fileID: 0}
     - target: {fileID: 6063327808818567580, guid: 729deec6e080cfa469aea735d7c78644,
         type: 3}
@@ -9164,7 +9164,7 @@ PrefabInstance:
     - target: {fileID: 7975666200123183704, guid: f788699e56a01e64ebc9590bf70346c7,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -13
+      value: -10.950001
       objectReference: {fileID: 0}
     - target: {fileID: 7975666200123183704, guid: f788699e56a01e64ebc9590bf70346c7,
         type: 3}
@@ -9174,7 +9174,7 @@ PrefabInstance:
     - target: {fileID: 7975666200123183704, guid: f788699e56a01e64ebc9590bf70346c7,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 32
+      value: 31.999996
       objectReference: {fileID: 0}
     - target: {fileID: 7975666200123183704, guid: f788699e56a01e64ebc9590bf70346c7,
         type: 3}
@@ -19197,7 +19197,7 @@ PrefabInstance:
     - target: {fileID: 7975666200123183704, guid: f788699e56a01e64ebc9590bf70346c7,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1
+      value: -1.15
       objectReference: {fileID: 0}
     - target: {fileID: 7975666200123183704, guid: f788699e56a01e64ebc9590bf70346c7,
         type: 3}
@@ -21052,7 +21052,7 @@ MonoBehaviour:
     type: 3}
   speed: 2
   monspawnPos:
-  - {x: 6, y: 5}
+  - {x: 7, y: 2}
   - {x: 4, y: 2}
   - {x: 9, y: 1}
   obspawnPos: []
@@ -21316,7 +21316,7 @@ PrefabInstance:
     - target: {fileID: 8072014167217623078, guid: a4140530cfba26e4f88f22ea8174b6f4,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -5
+      value: 5.13
       objectReference: {fileID: 0}
     - target: {fileID: 8072014167217623078, guid: a4140530cfba26e4f88f22ea8174b6f4,
         type: 3}

@@ -31,6 +31,24 @@ public class Tile : MonoBehaviour
         Occupied
 
     }
+    public bool getDir(int i)
+    {
+        //상 하 우 좌 순서
+        switch (i)
+        {
+            case 0:
+                return upB;
+               
+            case 1:
+                return downB;
+                case 2:
+                return rightB;
+            case 3:
+                return leftB;
+            default:
+                return false;
+        }
+    }
     void Update()
     {
         if (state != TileState.Occupied)

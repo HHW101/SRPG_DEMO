@@ -15,6 +15,7 @@ public class Pathfinder
         
     }
     //배열 뒤집는 연산 하기 아까우니까 처음부터 역으로 계산하려 했는데 이럼 안 될 수도 있음 그런 경우: 길을 찾고 전부 이동하는 게 아닐 수도 있다.  
+   
     public List<Tile> FindNext(Tile startTile, Tile endTile)
     {
         Tile currentTIle=startTile;
@@ -22,46 +23,67 @@ public class Pathfinder
         HashSet<Tile> closedTiles = new HashSet<Tile>();
         Grid.instance.resetF();
        openTiles.Add(currentTIle);
-     
+        int[] dx = { 0, 0, 1, -1 }; 
+        int[] dy = { 1, -1, 0, 0 }; 
         while (openTiles.Count>0&&!closedTiles.Contains(endTile))
         {
             closedTiles.Add(currentTIle);
             
-
-            //시작점 상하좌우를 openlist에 넣는다. 
-            for (int i = -1; i <= 1; i+=2)
+            for(int i = 0; i < 4; i++)
             {
-                Tile tempTIle = Grid.instance.getTile(currentTIle.getX() + i, currentTIle.getY());
-
-                if (tempTIle != null&&!closedTiles.Contains(tempTIle))
-                {
-                    if (!openTiles.Contains(tempTIle) || currentTIle.gCost + 1 < tempTIle.gCost) //만약 오픈리스트에 존재하지 않거나/원래 있던 g코스트보다 더 낮은 경우 즉: 저장 된 경우보다 이동 거리가 짧은 경우
+                if (currentTIle.getDir(i))
+                    continue;
+                Tile tempTIle = Grid.instance.getTile(currentTIle.getX() + dx[i], currentTIle.getY() + dy[i]);
+               
+              if (tempTIle != null && !closedTiles.Contains(tempTIle))
                     {
-                        tempTIle.gCost = currentTIle.gCost + 1;    //교체한다! 
-                        tempTIle.hCost = Mathf.Abs(endTile.getX() - tempTIle.getX()) + Mathf.Abs(endTile.getY() - tempTIle.getY());
-                        if(!openTiles.Contains(tempTIle))
-                            openTiles.Add(tempTIle);
-                        tempTIle.parent = currentTIle; //부모로 지정
+                        if (!openTiles.Contains(tempTIle) || currentTIle.gCost + 1 < tempTIle.gCost) //만약 오픈리스트에 존재하지 않거나/원래 있던 g코스트보다 더 낮은 경우 즉: 저장 된 경우보다 이동 거리가 짧은 경우
+                        {
+                            tempTIle.gCost = currentTIle.gCost + 1;    //교체한다! 
+                            tempTIle.hCost = Mathf.Abs(endTile.getX() - tempTIle.getX()) + Mathf.Abs(endTile.getY() - tempTIle.getY());
+                            if (!openTiles.Contains(tempTIle))
+                                openTiles.Add(tempTIle);
+                            tempTIle.parent = currentTIle; //부모로 지정
+                        }
                     }
-                }
+
+                
+            }
+
+            ////시작점 상하좌우를 openlist에 넣는다. 
+            //for (int i = -1; i <= 1; i+=2)
+            //{
+            //    Tile tempTIle = Grid.instance.getTile(currentTIle.getX() + i, currentTIle.getY());
+
+            //    if (tempTIle != null&&!closedTiles.Contains(tempTIle))
+            //    {
+            //        if (!openTiles.Contains(tempTIle) || currentTIle.gCost + 1 < tempTIle.gCost) //만약 오픈리스트에 존재하지 않거나/원래 있던 g코스트보다 더 낮은 경우 즉: 저장 된 경우보다 이동 거리가 짧은 경우
+            //        {
+            //            tempTIle.gCost = currentTIle.gCost + 1;    //교체한다! 
+            //            tempTIle.hCost = Mathf.Abs(endTile.getX() - tempTIle.getX()) + Mathf.Abs(endTile.getY() - tempTIle.getY());
+            //            if(!openTiles.Contains(tempTIle))
+            //                openTiles.Add(tempTIle);
+            //            tempTIle.parent = currentTIle; //부모로 지정
+            //        }
+            //    }
              
-            }
-            for (int j = -1; j <= 1; j += 2)
-            {
-                Tile tempTIle = Grid.instance.getTile(currentTIle.getX(), currentTIle.getY() + j);
-                if (tempTIle != null && !closedTiles.Contains(tempTIle))
-                {
+            //}
+            //for (int j = -1; j <= 1; j += 2)
+            //{
+            //    Tile tempTIle = Grid.instance.getTile(currentTIle.getX(), currentTIle.getY() + j);
+            //    if (tempTIle != null && !closedTiles.Contains(tempTIle))
+            //    {
 
-                    if (!openTiles.Contains(tempTIle) || currentTIle.gCost + 1 < tempTIle.gCost)
-                    {
-                        tempTIle.gCost = currentTIle.gCost + 1;
-                        tempTIle.hCost = Mathf.Abs(endTile.getX() - tempTIle.getX()) + Mathf.Abs(endTile.getY() - tempTIle.getY());
-                        if (!openTiles.Contains(tempTIle))
-                            openTiles.Add(tempTIle);
-                        tempTIle.parent = currentTIle;
-                    }
-                }
-            }
+            //        if (!openTiles.Contains(tempTIle) || currentTIle.gCost + 1 < tempTIle.gCost)
+            //        {
+            //            tempTIle.gCost = currentTIle.gCost + 1;
+            //            tempTIle.hCost = Mathf.Abs(endTile.getX() - tempTIle.getX()) + Mathf.Abs(endTile.getY() - tempTIle.getY());
+            //            if (!openTiles.Contains(tempTIle))
+            //                openTiles.Add(tempTIle);
+            //            tempTIle.parent = currentTIle;
+            //        }
+            //    }
+            //}
             openTiles.Remove(currentTIle);
             openTiles.Sort(CompareT);
 
