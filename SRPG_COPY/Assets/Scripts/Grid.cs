@@ -21,6 +21,7 @@ public class Grid : MonoBehaviour
     [SerializeField] private Vector2[] monspawnPos = new Vector2[5];
     [SerializeField] private Vector2[] obspawnPos = new Vector2[5];
     [SerializeField] private GameObject obspre;
+    public bool canClick =true;
     private Tile selectTile;
     public Camera cam;
     private HashSet<Tile> goTiles = new HashSet<Tile>();
@@ -59,14 +60,18 @@ public class Grid : MonoBehaviour
     }
     private void Update()
     {
+        if (!canClick)
+            return;
         switch (TurnManager.instance.turn)
         {
             case TurnManager.TurnState.pMoveTurn:
                 Grid.instance.cam.ChangeTarget(player.gameObject);
                 Moving();
+                
                 break;
             case TurnManager.TurnState.pAttackTurn:
                 Attack();
+               
                 break;
         }
     }
@@ -78,26 +83,25 @@ public class Grid : MonoBehaviour
         {
             if (selectTile.getX() < GridX - 1)
                 ShiftSelect(1, 0);
-            ShowSetTile();
+       
         }
         if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
             if (selectTile.getX() > 0)
                 ShiftSelect(-1, 0);
-            ShowSetTile();
+          
         }
         if (Input.GetKeyDown(KeyCode.UpArrow))
         {
             if (selectTile.getY() < GridY - 1)
                 ShiftSelect(0, 1);
-            ShowSetTile();
+        
         }
         if (Input.GetKeyDown(KeyCode.DownArrow))
         {
             if (selectTile.getY() > 0)
                 ShiftSelect(0, -1);
-
-            ShowSetTile();
+            ;
         }
         if (Input.GetKeyDown(KeyCode.Z))
         {
@@ -111,6 +115,7 @@ public class Grid : MonoBehaviour
             else if(selectTile.state==Tile.TileState.Occupied)
             {
                 player.Attack(selectTile.on);
+                canClick = false;
                 isRunning = false;
             }
         }
@@ -120,34 +125,27 @@ public class Grid : MonoBehaviour
     {
         if (selectTile == null && Input.anyKeyDown)
         {
-            selectTile = player.unitTIle;
-            selectTile.SetPState(Tile.PState.Select);
-            ShowSetTile();
+            setSelect(player.unitTIle);
+            
         }
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {
-            if (selectTile.getX() < GridX - 1)
                 ShiftSelect(1, 0);
-            ShowSetTile();
+          
         }
         if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            if (selectTile.getX() > 0)
                 ShiftSelect(-1, 0);
-            ShowSetTile();
+            
         }
         if (Input.GetKeyDown(KeyCode.UpArrow))
         {
-            if (selectTile.getY() < GridY - 1)
                 ShiftSelect(0, 1);
-            ShowSetTile();
+            
         }
         if (Input.GetKeyDown(KeyCode.DownArrow))
         {
-            if (selectTile.getY() > 0)
                 ShiftSelect(0, -1);
-
-            ShowSetTile();
         }
         if (Input.GetKeyDown(KeyCode.Z))
         {
@@ -162,20 +160,31 @@ public class Grid : MonoBehaviour
             {
                 ClickTile();
                 isRunning = false;
+                canClick = false;
             }
         }
     }
+    public void setSelect(Tile t)
+    {
+        selectTile = t;
+        selectTile.SetPState(Tile.PState.Select);
+    }
     public void ShiftSelect(int x,int y)
     {
-        if (!goTiles.Contains(grid[selectTile.getX() + x, selectTile.getY() + y]))
+        int nx=selectTile.getX()+x;
+        int ny=selectTile.getY()+y;
+        if (nx<0||ny<0|| nx>GridX||ny>GridY|| grid[nx,ny] == null)
+            return;
+        if (!goTiles.Contains(grid[nx, ny]))
             return;
         if (goTiles.Contains(selectTile))
             selectTile.SetPState(Tile.PState.CanGO);
         else
             selectTile.SetPState(Tile.PState.Idle);
  
-        selectTile = grid[selectTile.getX()+x, selectTile.getY() + y];
+        selectTile = grid[nx, ny];
         selectTile.SetPState(Tile.PState.Select);
+        UIManager.instance.ShowTile(selectTile);
     }
     public HashSet<Tile> GetRange(int x, int y, int cnt)
     {
@@ -274,17 +283,15 @@ public class Grid : MonoBehaviour
     public Tile getTile(int x, int y)
     {
         if(x< 0 || y < 0||x>=GridX||y>=GridY) return null;
+       
         if (grid[x, y] == null) return null;
-        if (grid[x,y].Getstate()!=Tile.TileState.Idle&&TurnManager.instance.turn!=TurnManager.TurnState.pAttackTurn) return null;
+      
+        //if (grid[x,y].Getstate()!=Tile.TileState.Idle&&TurnManager.instance.turn!=TurnManager.TurnState.pAttackTurn) return null;
         if (grid[x,y].Getstate()==Tile.TileState.Block) return null;
         return grid[x, y];
     }
    
-    private void ShowSetTile()
-    {   
-       
-        Debug.Log("현재 선택 X:"+selectTile.getX()+"Y:"+selectTile.getY());
-    }
+  
     private void makeMap()
     {
       
@@ -295,7 +302,7 @@ public class Grid : MonoBehaviour
             Vector3 tilePositon = tile.transform.position;
             int x= Mathf.RoundToInt(tilePositon.x)/4;
             int y= Mathf.RoundToInt(tilePositon.z)/4;
-            Debug.Log($"타일 들어옴{tile}{x}{y}");
+           
             if (x >= 0 && x < GridX && y >= 0 && y < GridY)
             {
                 // 타일을 2차원 배열에 저장
@@ -304,16 +311,16 @@ public class Grid : MonoBehaviour
             }
         }
         // 좌표값을 출력하여 확인
-        for (int i = 0; i < GridX; i++)
-        {
-            for (int j = 0; j < GridY; j++)
-            {
-                if (grid[i, j] != null)
-                {
-                    Debug.Log($"Tile at grid[{i}, {j}] is {grid[i, j].name}");
-                }
-            }
-        }
+        //for (int i = 0; i < GridX; i++)
+        //{
+        //    for (int j = 0; j < GridY; j++)
+        //    {
+        //        if (grid[i, j] != null)
+        //        {
+        //            Debug.Log($"Tile at grid[{i}, {j}] is {grid[i, j].name}");
+        //        }
+        //    }
+        //}
         //for (int i = 0; i < GridX; i++)
         //{
         //    for (int j = 0; j < GridY; j++)
@@ -343,6 +350,7 @@ public class Grid : MonoBehaviour
         player.unitTIle = grid[x, y];
         grid[x,y].Setstate(Tile.TileState.Occupied);
         grid[x,y].on = player.gameObject;
+        player.SetDirection(UnitP.Direction.right);
 
     }
     public Player FIndPlayer()
@@ -361,6 +369,7 @@ public class Grid : MonoBehaviour
             monster[i].unitTIle = grid[x, y];
             grid[x, y].Setstate(Tile.TileState.Occupied);
             grid[x, y].on = monster[i].gameObject;
+            monster[i].monsterNum = i;
             if (x > y)
                 monster[i].SetDirection(Monster.Direction.left);
             else

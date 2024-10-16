@@ -9,7 +9,7 @@ AnimatorStateTransition:
   m_Name: 
   m_Conditions:
   - m_ConditionMode: 1
-    m_ConditionEvent: isRunnig
+    m_ConditionEvent: isRunning
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 110264237}
@@ -59,12 +59,6 @@ AnimatorController:
   m_Name: FreeGolem
   serializedVersion: 5
   m_AnimatorParameters:
-  - m_Name: isRunnig
-    m_Type: 4
-    m_DefaultFloat: 0
-    m_DefaultInt: 0
-    m_DefaultBool: 0
-    m_Controller: {fileID: 0}
   - m_Name: isAttack
     m_Type: 4
     m_DefaultFloat: 0
@@ -78,6 +72,12 @@ AnimatorController:
     m_DefaultBool: 0
     m_Controller: {fileID: 0}
   - m_Name: isDie
+    m_Type: 4
+    m_DefaultFloat: 0
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 0}
+  - m_Name: isRunning
     m_Type: 4
     m_DefaultFloat: 0
     m_DefaultInt: 0
@@ -328,7 +328,7 @@ AnimatorStateMachine:
     m_Position: {x: 250, y: 30, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 110224626}
-    m_Position: {x: 180, y: -168, z: 0}
+    m_Position: {x: 180, y: -170, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 110231694}
     m_Position: {x: 300, y: -300, z: 0}
@@ -385,7 +385,7 @@ AnimatorStateTransition:
   m_Name: 
   m_Conditions:
   - m_ConditionMode: 2
-    m_ConditionEvent: isRunnig
+    m_ConditionEvent: isRunning
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 110224626}

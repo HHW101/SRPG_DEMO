@@ -5,17 +5,24 @@ using UnityEngine;
 public class Tile : MonoBehaviour
 {
 
-     private int tileX;
-     private int tileY;
+    private int tileX;
+    private int tileY;
     public int gCost;
     public int hCost;
     public bool canGo;
+    public int moveCost = 1;
     public GameObject selectTile;
     public GameObject selectTilePre;
     private GameObject goTile;
     public GameObject goTilePre;
     public Tile parent;
     public GameObject on;
+    [SerializeField]
+    public bool upB= false;
+    [SerializeField]
+    public bool downB = false;
+    [SerializeField] public bool leftB = false;
+    [SerializeField] public bool rightB  = false;
     public int fCost { get {  return gCost+hCost; } }
      public enum TileState
     {

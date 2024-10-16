@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Pathfinder : MonoBehaviour
+public class Pathfinder 
 {
 
     [SerializeField]
@@ -22,7 +22,7 @@ public class Pathfinder : MonoBehaviour
         HashSet<Tile> closedTiles = new HashSet<Tile>();
         Grid.instance.resetF();
        openTiles.Add(currentTIle);
-        bool fin = false;
+     
         while (openTiles.Count>0&&!closedTiles.Contains(endTile))
         {
             closedTiles.Add(currentTIle);
@@ -75,6 +75,13 @@ public class Pathfinder : MonoBehaviour
         }
         List<Tile> route = new List<Tile>(); 
         closedTiles.Add(currentTIle);
+        if(openTiles.Count == 0)
+        {
+            Debug.Log($"시작: X = {startTile.getX()}, Y = {startTile.getY()}");
+            Debug.Log($"끝: X = {endTile.getX()}, Y = {endTile.getY()}");
+            Debug.Log(route + "탐색 실패" + endTile);
+            return null;
+        }
         while(currentTIle.parent!= null)
         {
              Debug.Log($"Processing tile: X = {currentTIle.getX()}, Y = {currentTIle.getY()}Gcost={currentTIle.gCost}hcost={currentTIle.hCost}fcost={currentTIle.fCost}");
@@ -85,7 +92,7 @@ public class Pathfinder : MonoBehaviour
         Grid.instance.resetF();
         if(closedTiles.Contains(endTile))
             return route;
-        return null;
+       return null;
     }
     int CompareT(Tile a,Tile b)
     {

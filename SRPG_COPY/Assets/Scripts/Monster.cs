@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class Monster : UnitP
 {
     public bool isActive=true;
+    public int monsterNum;
     public enum MonsterState
     {
         Idle, Attack, Move, Hit,Die
@@ -52,7 +53,9 @@ public class Monster : UnitP
         Grid.instance.cam.ZoomIn();
         Pathfinder path = new Pathfinder();
         List<Tile> temp = new List<Tile>();
-        temp = path.FindNext(Grid.instance.FIndPlayer().unitTIle, unitTIle);
+        temp = path.FindNext(unitTIle, Grid.instance.FIndPlayer().unitTIle);
+        Debug.Log(temp.Count);
+        foreach (Tile tile in temp) { Debug.Log(tile+"아니 아게 맞나"); }
         if(temp.Count>runAble)
             temp = temp.GetRange(0, runAble);
 
@@ -65,7 +68,7 @@ public class Monster : UnitP
     // Update is called once per frame
     void Update()
     {
-        if (TurnManager.instance.turn != TurnManager.TurnState.enemyTurn)
+        if (TurnManager.instance.turn != TurnManager.TurnState.enemyTurn||monsterNum!=0)
             return;
         switch (state)
         {
@@ -78,9 +81,10 @@ public class Monster : UnitP
                  
                 break;
             case MonsterState.Move:
+                ChangeState(MonsterState.Attack);
                 Findplayer();
            
-                ChangeState(MonsterState.Attack);
+                
                 break;
             case MonsterState.Hit:
                 

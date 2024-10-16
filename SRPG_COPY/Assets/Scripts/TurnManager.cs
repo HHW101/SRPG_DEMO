@@ -10,6 +10,7 @@ public class TurnManager : MonoBehaviour
         start, pMoveTurn,pAttackTurn, enemyTurn,end
     }
     public TurnState turn;
+    public bool isProcessing = false; 
     public static TurnManager instance;
     private void Awake()
     {

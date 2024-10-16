@@ -21,12 +21,14 @@ public class UnitP : MonoBehaviour
     public int unitY;
     protected HashSet<Tile> RangeTiles = new HashSet<Tile>();
     public Tile unitTIle;
+    public Direction dirU;
     public enum Direction
     {
         up, down, left, right
     }
     public void SetDirection(Direction direction)
     {
+        dirU = direction;
         switch (direction)
         {
             case Direction.up:
@@ -120,7 +122,7 @@ public class UnitP : MonoBehaviour
         animator.SetBool("isRunning", true);
         Vector3 rot = direction - transform.position;
         transform.rotation = Quaternion.LookRotation(rot.normalized);
-        while (Vector3.Distance(transform.position, direction) > 0.01f)
+        while (Vector3.Distance(transform.position, direction) > 0.05f)
         {
             transform.position = Vector3.MoveTowards(transform.position, direction, moveSpeed * Time.deltaTime);
             yield return null;
@@ -134,7 +136,34 @@ public class UnitP : MonoBehaviour
 
         unitTIle.state = Tile.TileState.Occupied;
         unitTIle.on = gameObject;
+        CheckDir();
         Grid.instance.cam.ZoomOut();
+        if(TurnManager.instance.turn!=TurnManager.TurnState.enemyTurn)
+            Grid.instance.canClick = true;
+    }
+    private void CheckDir()
+    {
+        float rot = gameObject.transform.rotation.eulerAngles.y;
+        if(rot<=10f&&rot >= -10f)
+        {
+            dirU = Direction.up;
+                transform.rotation = Quaternion.Euler(0, 0, 0);
+         }
+        else if (rot <= 190f && rot >= 170f)
+        {
+            dirU = Direction.down;
+            transform.rotation = Quaternion.Euler(0, 180, 0);
+        }
+        else if (rot <= 280f && rot >= 260f)
+        {
+            dirU = Direction.left;
+            transform.rotation = Quaternion.Euler(0, 270, 0);
+        }
+        else
+        {
+            dirU = Direction.right;
+            transform.rotation = Quaternion.Euler(0, 90, 0);
+        }
     }
     // Update is called once per frame
     
