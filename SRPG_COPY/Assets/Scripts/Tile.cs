@@ -42,9 +42,9 @@ public class Tile : MonoBehaviour
     {
         tileX = x;
         tileY = y;
-        goTile = Instantiate(goTilePre, gameObject.transform.position + new Vector3(0, 0.1f, 0), gameObject.transform.rotation);
+        goTile = Instantiate(goTilePre, gameObject.transform.position + new Vector3(0, 0.1f, 0), Quaternion.Euler(new Vector3(90,0,0)));
         goTile.SetActive(false);
-        selectTile = Instantiate(selectTilePre, gameObject.transform.position + new Vector3(0, 0.1f, 0), gameObject.transform.rotation);
+        selectTile = Instantiate(selectTilePre, gameObject.transform.position + new Vector3(0, 0.1f, 0), Quaternion.Euler(new Vector3(90, 0, 0)));
         selectTile.SetActive(false);
         Setstate(TileState.Idle);
     }

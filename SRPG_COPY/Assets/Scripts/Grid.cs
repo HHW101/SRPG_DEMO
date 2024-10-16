@@ -10,6 +10,7 @@ using static UnityEngine.GraphicsBuffer;
 
 public class Grid : MonoBehaviour
 {
+    
     [SerializeField] private Tile[,] grid;
     [SerializeField] private int GridX =10;
     [SerializeField] private int GridY =10;
@@ -29,11 +30,13 @@ public class Grid : MonoBehaviour
     private int TileY;
     private bool isRunning;
     public static Grid instance;
-    
+   
     public void resetF()
     {
         foreach(var tile in grid)
         {
+            if (tile == null)
+                continue;
             tile.gCost = 0;
             tile.hCost = 0;
             tile.parent = null;
@@ -50,7 +53,7 @@ public class Grid : MonoBehaviour
         isRunning = false;
         grid = new Tile[GridX, GridY];
         makeMap();
-        SetPlayer(0,0);
+        SetPlayer(0,1);
         SetMonster();
         
     }
@@ -116,7 +119,7 @@ public class Grid : MonoBehaviour
     {
         if (selectTile == null && Input.anyKeyDown)
         {
-            selectTile = grid[0, 0];
+            selectTile = player.unitTIle;
             selectTile.SetPState(Tile.PState.Select);
             ShowSetTile();
         }
@@ -283,29 +286,55 @@ public class Grid : MonoBehaviour
     }
     private void makeMap()
     {
-
+      
+        GameObject[] tiles = GameObject.FindGameObjectsWithTag("Tile");
+     
+        foreach (GameObject tile in tiles) {
+           
+            Vector3 tilePositon = tile.transform.position;
+            int x= Mathf.RoundToInt(tilePositon.x)/4;
+            int y= Mathf.RoundToInt(tilePositon.z)/4;
+            Debug.Log($"타일 들어옴{tile}{x}{y}");
+            if (x >= 0 && x < GridX && y >= 0 && y < GridY)
+            {
+                // 타일을 2차원 배열에 저장
+                grid[x, y] = tile.GetComponent<Tile>();
+                grid[x, y].SetCoord(x, y);
+            }
+        }
+        // 좌표값을 출력하여 확인
         for (int i = 0; i < GridX; i++)
         {
             for (int j = 0; j < GridY; j++)
             {
-                
-                grid[i, j] = Instantiate(tilePre, new Vector3(i*2, 0, j*2), Quaternion.Euler(new Vector3(90, 0, 0)));
-                grid[i, j].SetCoord(i, j);
-                Debug.Log(i+"확인"+j+grid[i, j]);
+                if (grid[i, j] != null)
+                {
+                    Debug.Log($"Tile at grid[{i}, {j}] is {grid[i, j].name}");
+                }
             }
         }
-        foreach(Vector2 i in obspawnPos)
-        {
-            grid[(int)i.x,(int)i.y].Setstate(Tile.TileState.Block);
-            Instantiate(obspre, grid[(int)i.x, (int)i.y].gameObject.transform.position + new Vector3(0, 0.1f, 0),quaternion.identity);
-        }
+        //for (int i = 0; i < GridX; i++)
+        //{
+        //    for (int j = 0; j < GridY; j++)
+        //    {
+
+        //        grid[i, j] = Instantiate(tilePre, new Vector3(i*2, 0, j*2), Quaternion.Euler(new Vector3(90, 0, 0)));
+        //        grid[i, j].SetCoord(i, j);
+        //        Debug.Log(i+"확인"+j+grid[i, j]);
+        //    }
+        //}
+        //foreach(Vector2 i in obspawnPos)
+        //{
+        //    grid[(int)i.x,(int)i.y].Setstate(Tile.TileState.Block);
+        //    Instantiate(obspre, grid[(int)i.x, (int)i.y].gameObject.transform.position + new Vector3(0, 0.1f, 0),quaternion.identity);
+        //}
     }
 
     public void SetPlayer(int x, int y)
     {
         if (player == null)
         {
-            player = Instantiate(PlayerPre, new Vector3(x * 2, 0.5f, y * 2), Quaternion.identity);
+            player = Instantiate(PlayerPre, new Vector3(x * 2, 0.2f, y * 2), Quaternion.identity);
         }
       
         player.playerX = 0;
@@ -315,6 +344,10 @@ public class Grid : MonoBehaviour
         grid[x,y].on = player.gameObject;
 
     }
+    public Player FIndPlayer()
+    {
+        return player;
+    }
     public void SetMonster()
     {
         
@@ -323,7 +356,7 @@ public class Grid : MonoBehaviour
             
             int x = (int)monspawnPos[i].x;
             int y = (int)monspawnPos[i].y;
-            monster[i] = Instantiate(MonsterPre, new Vector3(x*2, 0.5f, y*2), Quaternion.identity);
+            monster[i] = Instantiate(MonsterPre, new Vector3(x*4, 0.2f, y*4), Quaternion.identity);
             monster[i].unitTIle = grid[x, y];
             grid[x, y].Setstate(Tile.TileState.Occupied);
             grid[x, y].on = monster[i].gameObject;

@@ -25,6 +25,7 @@ public class Player : UnitP
     {
         base.Attack(a);
         Debug.Log($"플레이어가 {a}를 공격");
+        TurnManager.instance.TurnChange(TurnManager.TurnState.enemyTurn);
     }
     public override void Damaged(float x)
     {
