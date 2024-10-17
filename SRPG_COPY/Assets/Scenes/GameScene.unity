@@ -21034,6 +21034,8 @@ GameObject:
   - component: {fileID: 1900370201}
   - component: {fileID: 1900370200}
   - component: {fileID: 1900370202}
+  - component: {fileID: 1900370203}
+  - component: {fileID: 1900370204}
   m_Layer: 0
   m_Name: MapManager
   m_TagString: Untagged
@@ -21063,8 +21065,6 @@ MonoBehaviour:
   speed: 2
   monspawnPos:
   - {x: 7, y: 2}
-  - {x: 4, y: 2}
-  - {x: 9, y: 1}
   obspawnPos: []
   obspre: {fileID: 1375754531036840, guid: 71497ec4178769a4c8cdb38563f01fc0, type: 3}
   canClick: 1
@@ -21098,6 +21098,65 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   turn: 0
   isProcessing: 0
+--- !u!114 &1900370203
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1900370199}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6277e73fd68d0244aaf08b1484ae791b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1900370204
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1900370199}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Actions: {fileID: -944628639613478452, guid: 89e6127fe0cb52c479444afe89123b3b,
+    type: 3}
+  m_NotificationBehavior: 2
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents:
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 04f32ff6-95be-4840-a531-764be09f99d5
+    m_ActionName: SelectTile/Move[/Keyboard/w,/Keyboard/s,/Keyboard/a,/Keyboard/d,/Keyboard/upArrow,/Keyboard/downArrow,/Keyboard/leftArrow,/Keyboard/rightArrow]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: dcb2be1e-675e-458b-80fe-4dee5ee151b1
+    m_ActionName: SelectTile/Click[/Keyboard/z]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: c8c84e04-b79d-4ded-9b08-29f89e468643
+    m_ActionName: SelectTile/Cancel[/Keyboard/x]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: c854f65d-810a-4d58-8dc9-b12cb780e478
+    m_ActionName: SelectTile/OpenMenu[/Keyboard/tab]
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: PC
+  m_DefaultActionMap: SelectTile
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}
 --- !u!1 &1911373914 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3031324824125265116, guid: c23e31fa1d2ac1c4b808105671ec82dd,

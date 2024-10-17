@@ -38,7 +38,7 @@ public class Player : UnitP
 
     }
     
-    public override void GetRange(mode s)
+    public override void GetRange(Pathfinder.PathMode s)
     {
         base.GetRange(s);
         GameManager.instance.setGo(RangeTiles);

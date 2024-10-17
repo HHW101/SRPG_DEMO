@@ -15,10 +15,17 @@ public class UnitP : MonoBehaviour
     public int range;
     protected Animator animator;
     public bool isMoving;
+    public bool isActive=false;
     protected float moveSpeed = 2f;
     public int runAble;
     public int unitX;
     public int unitY;
+    [SerializeField]
+    private float atk =5;
+    [SerializeField]
+    public int moveC = 1;
+    [SerializeField]
+    public int atkC = 1;
     protected HashSet<Tile> RangeTiles = new HashSet<Tile>();
     public Tile unitTIle;
     public Direction dirU;
@@ -63,7 +70,7 @@ public class UnitP : MonoBehaviour
 
     public virtual void Attack(GameObject a)
     {
-       // GetRange(mode.attack);
+        a.GetComponent<UnitP>().Damaged(atk);
     }
     public virtual void Damaged(float x)
     {
@@ -81,18 +88,15 @@ public class UnitP : MonoBehaviour
         StartCoroutine(MovePlayer(t));
 
     }
-    public virtual void GetRange(mode s)
+    public virtual void GetRange(Pathfinder.PathMode s)
     {
-        switch (s) {
-            case mode.attack:
-                RangeTiles = GameManager.instance.GetRange(unitX, unitY, range);
-                break;
-            case mode.move:
-                RangeTiles = GameManager.instance.GetRange(unitX, unitY, runAble);
-                break;
-        }
 
-        
+        if(s==Pathfinder.PathMode.pA||s==Pathfinder.PathMode.mA)
+            RangeTiles = GameManager.instance.GetRange(unitX, unitY, range,s);
+         else
+            RangeTiles = GameManager.instance.GetRange(unitX, unitY, runAble, s);
+
+
     }
     private IEnumerator MovePlayer(Vector3 direction)
     {
@@ -125,7 +129,7 @@ public class UnitP : MonoBehaviour
         animator.SetBool("isRunning", true);
         Vector3 rot = direction - transform.position;
         transform.rotation = Quaternion.LookRotation(rot.normalized);
-        while (Vector3.Distance(transform.position, direction) > 0.05f)
+        while (Vector3.Distance(transform.position, direction) > 0.03f)
         {
             transform.position = Vector3.MoveTowards(transform.position, direction, moveSpeed * Time.deltaTime);
             yield return null;
@@ -141,8 +145,11 @@ public class UnitP : MonoBehaviour
         unitTIle.on = gameObject;
         CheckDir();
         GameManager.instance.cam.ZoomOut();
-        if(TurnManager.instance.turn!=TurnManager.TurnState.enemyTurn)
+        unitX = unitTIle.getX();
+        unitY = unitTIle.getY();
+        if (TurnManager.instance.turn!=TurnManager.TurnState.enemyTurn)
             GameManager.instance.canClick = true;
+        isActive = false;
     }
     private void CheckDir()
     {

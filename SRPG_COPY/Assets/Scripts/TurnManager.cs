@@ -38,6 +38,8 @@ public class TurnManager : MonoBehaviour
     {
         if(Input.GetKeyDown(KeyCode.P))
             TurnChange(TurnState.pMoveTurn);
+        if (Input.GetKeyDown(KeyCode.X))
+            TurnChange(TurnState.enemyTurn);
         if (Input.GetKeyDown(KeyCode.O))
             TurnChange(TurnState.pAttackTurn);
     }

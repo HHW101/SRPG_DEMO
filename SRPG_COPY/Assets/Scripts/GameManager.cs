@@ -82,37 +82,13 @@ public class GameManager : MonoBehaviour
     public void Attack()
     {
         
-        if (Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            if (selectTile.getX() < GridX - 1)
-                ShiftSelect(1, 0);
-       
-        }
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            if (selectTile.getX() > 0)
-                ShiftSelect(-1, 0);
-          
-        }
-        if (Input.GetKeyDown(KeyCode.UpArrow))
-        {
-            if (selectTile.getY() < GridY - 1)
-                ShiftSelect(0, 1);
-        
-        }
-        if (Input.GetKeyDown(KeyCode.DownArrow))
-        {
-            if (selectTile.getY() > 0)
-                ShiftSelect(0, -1);
-            ;
-        }
         if (Input.GetKeyDown(KeyCode.Z))
         {
             if (!isRunning)
             {
                 selectTile.SetPState(Tile.PState.Select);
             
-                player.GetRange(UnitP.mode.attack);
+                player.GetRange(Pathfinder.PathMode.pA);
                 isRunning = true;
             }
             else if(selectTile.state==Tile.TileState.Occupied)
@@ -126,37 +102,13 @@ public class GameManager : MonoBehaviour
     }
     private void Moving()
     {
-        if (selectTile == null && Input.anyKeyDown)
-        {
-            setSelect(player.unitTIle);
-            
-        }
-        if (Input.GetKeyDown(KeyCode.RightArrow))
-        {
-                ShiftSelect(1, 0);
-          
-        }
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-                ShiftSelect(-1, 0);
-            
-        }
-        if (Input.GetKeyDown(KeyCode.UpArrow))
-        {
-                ShiftSelect(0, 1);
-            
-        }
-        if (Input.GetKeyDown(KeyCode.DownArrow))
-        {
-                ShiftSelect(0, -1);
-        }
-        if (Input.GetKeyDown(KeyCode.Z))
+          if (Input.GetKeyDown(KeyCode.Z))
         {
             if (!isRunning)
             {
                 selectTile.SetPState(Tile.PState.Select);
                 //getCango(selectTile.getX(), selectTile.getY());
-                player.GetRange(UnitP.mode.move);
+                player.GetRange(Pathfinder.PathMode.pM);
                 isRunning = true;
             }
             else
@@ -174,8 +126,10 @@ public class GameManager : MonoBehaviour
     }
     public void ShiftSelect(int x,int y)
     {
+      
         int nx=selectTile.getX()+x;
         int ny=selectTile.getY()+y;
+        Debug.Log($"{nx}:{ny}");
         if (nx<0||ny<0|| nx>GridX||ny>GridY|| grid[nx,ny] == null)
             return;
         if (!goTiles.Contains(grid[nx, ny]))
@@ -189,11 +143,9 @@ public class GameManager : MonoBehaviour
         selectTile.SetPState(Tile.PState.Select);
         UIManager.instance.ShowTile(selectTile);
     }
-    public HashSet<Tile> GetRange(int x, int y, int cnt)
+    public HashSet<Tile> GetRange(int x, int y, int cnt,Pathfinder.PathMode mode)
     {
-        HashSet<Tile> range = new HashSet<Tile>();
-        Debug.Log($"{x}:{y}{getTile(x, y)}");
-        range= path.Range(getTile(x,y), cnt);
+
         //range.Add(getTile(x, y));
 
         //for (int dx = -cnt; dx <= cnt; dx++)
@@ -206,7 +158,7 @@ public class GameManager : MonoBehaviour
 
         //    }
         //}
-        return range;
+        return path.Range(getTile(x, y), cnt,mode);
     }
     public void setGo(HashSet<Tile> tiles)
     {
@@ -276,7 +228,7 @@ public class GameManager : MonoBehaviour
         //player.GoTo(selectTile.transform.position);
         
         List<Tile> temp = new List<Tile>();    
-        temp=path.FindNext(player.unitTIle, selectTile);
+        temp=path.FindNext(player.unitTIle, selectTile,Pathfinder.PathMode.pM);
         if (temp != null)
             player.GoTo(temp);
         player.unitX=selectTile.getX();
@@ -357,6 +309,7 @@ public class GameManager : MonoBehaviour
         grid[x,y].Setstate(Tile.TileState.Occupied);
         grid[x,y].on = player.gameObject;
         player.SetDirection(UnitP.Direction.right);
+        setSelect(player.unitTIle);
 
     }
     public Player FIndPlayer()

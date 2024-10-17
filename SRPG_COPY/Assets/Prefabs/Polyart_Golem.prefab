@@ -395,13 +395,14 @@ MonoBehaviour:
   hp: 10
   range: 1
   isMoving: 0
+  isActive: 0
   runAble: 5
   unitX: 0
   unitY: 0
   unitTIle: {fileID: 0}
   dirU: 0
-  isActive: 1
   monsterNum: 0
+  isAttack: 0
   state: 0
 --- !u!54 &2410651181235596926
 Rigidbody:

@@ -6,14 +6,17 @@ public class Pathfinder
 {
 
   
-
+    public enum PathMode
+    {
+        mA,mM,pA,pM
+    }
     // Start is called before the first frame update
     void Start()
     {
         
     }
     //BFS 사용
-   public HashSet<Tile> Range(Tile startTile,int cnt)
+   public HashSet<Tile> Range(Tile startTile,int cnt,PathMode mode)
     {
 
         Tile currentTIle = startTile;
@@ -21,7 +24,7 @@ public class Pathfinder
         HashSet<Tile> closedTiles = new HashSet<Tile>();
         GameManager.instance.resetF();
         openTiles.Enqueue(currentTIle);
-        Debug.Log(currentTIle);
+        //Debug.Log(currentTIle);
         currentTIle.gCost = 0;
         int[] dx = { 0, 0, 1, -1 };
         int[] dy = { 1, -1, 0, 0 };
@@ -41,8 +44,24 @@ public class Pathfinder
                 {
                     if (tempTIle.state == Tile.TileState.Occupied)
                     {
-                        Debug.Log("체크");
-                        continue;
+                        switch (mode)
+                        {
+                            case PathMode.pM:
+                                if (tempTIle.on.GetComponent<Monster>() != null)
+                                {
+                                    Debug.Log("체크");
+                                    continue;
+                                }
+                                break;
+                            case PathMode.mM:
+                                {
+                                    if (tempTIle.on.GetComponent<Player>() != null)
+                                        continue;
+                                }
+                                break;
+                        }
+                        
+                        
                     }
                     if (!openTiles.Contains(tempTIle) || currentTIle.gCost + 1 < tempTIle.gCost) //cnt가 더 짧을 때
                     {
@@ -61,7 +80,7 @@ public class Pathfinder
         GameManager.instance.resetF();
         return closedTiles;
     }
-    public List<Tile> FindNext(Tile startTile, Tile endTile)
+    public List<Tile> FindNext(Tile startTile, Tile endTile, PathMode mode)
     {
         Tile currentTIle=startTile;
         List<Tile> openTiles = new List<Tile>();
@@ -82,7 +101,30 @@ public class Pathfinder
                
               if (tempTIle != null && !closedTiles.Contains(tempTIle))
                     {
-                        if (!openTiles.Contains(tempTIle) || currentTIle.gCost + 1 < tempTIle.gCost) //만약 오픈리스트에 존재하지 않거나/원래 있던 g코스트보다 더 낮은 경우 즉: 저장 된 경우보다 이동 거리가 짧은 경우
+                    if (tempTIle.state == Tile.TileState.Occupied)
+                    {
+                        switch (mode)
+                        {
+                            case PathMode.pM:
+                                if (tempTIle.on.GetComponent<Monster>() != null)
+                                {
+                                    Debug.Log("체크");
+                                    continue;
+                                }
+                                break;
+                            case PathMode.mM:
+                                {
+                                    //if (tempTIle.on.GetComponent<Player>() != null)
+                                       // continue;
+                                }
+                                break;
+                        }
+
+
+                    }
+
+
+                    if (!openTiles.Contains(tempTIle) || currentTIle.gCost + 1 < tempTIle.gCost) //만약 오픈리스트에 존재하지 않거나/원래 있던 g코스트보다 더 낮은 경우 즉: 저장 된 경우보다 이동 거리가 짧은 경우
                         {
                             tempTIle.gCost = currentTIle.gCost + 1;    //교체한다! 
                             tempTIle.hCost = Mathf.Abs(endTile.getX() - tempTIle.getX()) + Mathf.Abs(endTile.getY() - tempTIle.getY());
@@ -147,7 +189,7 @@ public class Pathfinder
             Debug.Log($"시작: X = {startTile.getX()}, Y = {startTile.getY()}");
             Debug.Log($"끝: X = {endTile.getX()}, Y = {endTile.getY()}");
             Debug.Log(route + "탐색 실패" + endTile);
-            return null;
+            
         }
         while(currentTIle.parent!= null)
         {
@@ -159,6 +201,7 @@ public class Pathfinder
         GameManager.instance.resetF();
         if(closedTiles.Contains(endTile))
             return route;
+        
        return null;
     }
     int CompareT(Tile a,Tile b)
