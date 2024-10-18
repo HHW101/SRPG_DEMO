@@ -13,7 +13,7 @@ public class Player : UnitP
  
 
     private Vector3 originPos, targetPos;
-    Pathfinder path = new Pathfinder();
+   
     public Tile selectTile;
     // Start is called before the first frame update
     protected override void Awake()
@@ -24,10 +24,21 @@ public class Player : UnitP
     {
         
     }
+   
     public override void Attack(GameObject a)
     {
         base.Attack(a);
         Debug.Log($"플레이어가 {a}를 공격");
+        foreach (Tile t in RangeTiles)
+        {
+            t.SetPState(Tile.PState.Idle);
+        }
+        if (--atkC == 0)
+        {
+            UIManager.instance.HideBMenu();
+            GameManager.instance.PlayerTurnChange();
+        }
+        //GameManager.instance.ChangeInputMode(GameManager.InputMode.s);
 
     }
     public override void Damaged(float x)
@@ -40,41 +51,53 @@ public class Player : UnitP
       
 
     }
-
+    protected override void ThinkAttack()
+    {
+        
+        state = UnitState.AttackThink;
+       
+    }
     
+
     public override void GetRange(Pathfinder.PathMode s)
     {
         base.GetRange(s);
-        Debug.Log($"위치 확인 부분: {RangeTiles.Count}");
+    
         //GameManager.instance.setGo(RangeTiles);
     }
         public void movePlayer(Tile selectTile)
       {
+        Debug.Log($"확인: {unitTIle.getX()}{unitTIle.getY()}");
+        unitTIle.Setstate(Tile.TileState.Idle);
         List<Tile> temp = new List<Tile>();
         temp = path.FindNext(unitTIle, selectTile, Pathfinder.PathMode.pM);
         if (temp != null)
             GoTo(temp);
-    }
-    // Update is called once per frame
-    private void AttackT()
-    {
-        if (Input.GetKeyDown(KeyCode.Z))
+        foreach(Tile t in RangeTiles)
         {
-            if (!isClick)
-            {
-                selectTile.SetPState(Tile.PState.Select);
-
-                GetRange(Pathfinder.PathMode.pA);
-                isClick = true;
-            }
-            else if (selectTile.state == Tile.TileState.Occupied)
-            {
-                Attack(selectTile.on);
-                isClick = false;
-                
-            }
+            t.SetPState(Tile.PState.Idle);
         }
     }
+    // Update is called once per frame
+    //private void AttackT()
+    //{
+    //    if (Input.GetKeyDown(KeyCode.Z))
+    //    {
+    //        if (!isClick)
+    //        {
+    //            selectTile.SetPState(Tile.PState.Select);
+
+    //            GetRange(Pathfinder.PathMode.pA);
+    //            isClick = true;
+    //        }
+    //        else if (selectTile.state == Tile.TileState.Occupied)
+    //        {
+    //            Attack(selectTile.on);
+    //            isClick = false;
+                
+    //        }
+    //    }
+    //}
   
     void Update()
     {

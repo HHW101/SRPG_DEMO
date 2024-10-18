@@ -24,6 +24,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Vector2[] obspawnPos = new Vector2[5];
     [SerializeField] private GameObject obspre;
     private Tile selectTile;
+    private Player selectPlayer;
     public Camera cam;
     private List<Player> player = new List<Player>();
     private List<Monster> monster = new List<Monster>();
@@ -33,7 +34,8 @@ public class GameManager : MonoBehaviour
     public static GameManager instance;
     Pathfinder path;
     public TurnState turn;
-    private int NowPNum =-1;
+    public int turnN=0;
+    //private int NowPNum =-1;
     private int NowMNum =-1;
     public enum TurnState
     {
@@ -48,6 +50,10 @@ public class GameManager : MonoBehaviour
     {
         inputmode = mode;
     }
+    public Vector3 SelectCamera()
+    {
+        return selectTile.transform.position;
+    } 
     public void resetF()
     {
         foreach(var tile in grid)
@@ -58,6 +64,12 @@ public class GameManager : MonoBehaviour
             tile.hCost = 0;
             tile.parent = null;
         }
+    }
+    public void StartTurn()
+    {
+        turnN++;
+        Debug.Log(turnN);
+        TurnChange(TurnState.playerTurn);
     }
     private void Awake()
     {
@@ -74,6 +86,10 @@ public class GameManager : MonoBehaviour
         path = new Pathfinder();
         inputmode = InputMode.Map;
     }
+   void Start()
+    {
+        StartTurn();  
+    }
     public void TurnChange(TurnState state)
     {
         turn = state;
@@ -88,57 +104,77 @@ public class GameManager : MonoBehaviour
     }
     private void StartGame()
     {
-        setSelect(player[NowPNum].unitTIle);
+        setSelect(selectPlayer.unitTIle);
     }
+    
     public void ClickTile()
     {
-        Debug.Log(NowPNum);
-        if (player[NowPNum].state == UnitP.UnitState.MoveThink)
+       
+        if (selectPlayer.state == UnitP.UnitState.MoveThink)
         {
-            player[NowPNum].movePlayer(selectTile);
-            player[NowPNum].ChangeState(UnitP.UnitState.Move);
-            GameManager.instance.ChangeInputMode(GameManager.InputMode.block);
+            if (selectTile.state == Tile.TileState.Idle)
+            {
+                selectPlayer.movePlayer(selectTile);
+                selectPlayer.ChangeState(UnitP.UnitState.Move);
+                GameManager.instance.ChangeInputMode(GameManager.InputMode.block);
+            }
+        }
+        if (selectPlayer.state == UnitP.UnitState.AttackThink)
+        {
+            if (selectTile.on != null && selectTile.on.GetComponent<Monster>() != null)
+            {
+                selectPlayer.Attack(selectTile.on);
+                //selectPlayer.ChangeState(UnitP.UnitState.Attack);
+                //GameManager.instance.ChangeInputMode(GameManager.InputMode.block);
+            }
         }
     }
     public void setSelect(Tile t)
     {
         if (selectTile != null)
-            selectTile.Setstate(Tile.TileState.Idle);
+            selectTile.SetPState(Tile.PState.Idle);
         selectTile = t;
         selectTile.SetPState(Tile.PState.Select);
-        cam.ChangeTarget(player[NowPNum].gameObject);
-    }
-    public void goToTile(Tile tile)
-    {
-        selectTile.SetPState(Tile.PState.Idle);
-        selectTile = tile;
-        selectTile.SetPState(Tile.PState.Select);
-        UIManager.instance.ShowTile(selectTile);
-    }
+        }
+    //public void goToTile(Tile tile)
+    //{
+    //    selectTile.SetPState(Tile.PState.Idle);
+    //    selectTile = tile;
+    //    selectTile.SetPState(Tile.PState.Select);
+    //    UIManager.instance.ShowTile(selectTile);
+    //}
     public void ShiftSelect(int x,int y,int mode) // 0: 맵 기준 타일 선택 1: 플레이어 기준 타일 선택
     {
             
         int nx=selectTile.getX()+x;
         int ny=selectTile.getY()+y;
-        Debug.Log($"{nx}:{ny}");
+      
         if (getTile(nx,ny) == null)
             return;
-        if (mode==1&&!player[NowPNum].RangeTiles.Contains(grid[nx, ny]))
+        if (mode==1&&!selectPlayer.RangeTiles.Contains(grid[nx, ny]))
             return;
-        if (mode == 1 && player[NowPNum].RangeTiles.Contains(selectTile))
+        if (mode == 1 && selectPlayer.RangeTiles.Contains(selectTile))
+        {
             selectTile.SetPState(Tile.PState.CanGO);
+            Debug.Log($"{nx}:{ny}확인{selectPlayer.RangeTiles.Count}");
+        }
         else
+        {
             selectTile.SetPState(Tile.PState.Idle);
- 
+            Debug.Log($"{nx}:{ny}2");
+        }
         selectTile = grid[nx, ny];
         selectTile.SetPState(Tile.PState.Select);
         UIManager.instance.ShowTile(selectTile);
     }
     public void startmove()
     {
-        setGo(player[NowPNum].RangeTiles);
+        // setGo(player[NowPNum].RangeTiles);
+        selectPlayer.GetRange(Pathfinder.PathMode.pM);
+        setGo(selectPlayer.RangeTiles);
         UIManager.instance.battleMenu.SetActive(false);
-        player[NowPNum].ChangeState(UnitState.MoveThink);
+        setSelect(selectPlayer.unitTIle);
+        selectPlayer.ChangeState(UnitState.MoveThink);
     }
     public void setGo(HashSet<Tile> tiles)
     {
@@ -158,24 +194,72 @@ public class GameManager : MonoBehaviour
     
     public void PlayerTurnChange()
     {
-        Debug.Log($"{player.Count},{NowPNum}");
-        if (player.Count-1 > NowPNum)
+        
+        if (IsPend()!=null)
         {
-            setSelect(player[++NowPNum].unitTIle);
-            player[NowPNum].GetRange(Pathfinder.PathMode.pM);
-            UIManager.instance.ShowBMenu(player[NowPNum]);
-            Debug.Log($"{NowPNum}:{player[NowPNum].RangeTiles.Count}");
+            setSelect(IsPend().unitTIle);
+            Debug.Log("순서");
+            ChangeInputMode(InputMode.Map);
         }
         else
         {
             TurnChange(TurnState.enemyTurn);
-            NowPNum=-1;
+            enemyTurnChange();
+            //NowPNum=-1;
         }
+    }
+   
+    public Player IsPend()
+    {
+        foreach(Player p in player)
+        {
+            if(p.moveC!=0)
+                return p;
+        }
+        return null;
+    }
+    public void SelectPlayer()
+    {
+        
+        selectPlayer = selectTile.on.GetComponent<Player>();
+        if (selectPlayer != null&&selectPlayer.moveC!=0)
+        {
+            setSelect(selectPlayer.unitTIle);
+            UIManager.instance.ShowBMenu(selectPlayer);
+            //Debug.Log($"{NowPNum}:{player[NowPNum].RangeTiles.Count}");
+            cam.ChangeTarget(selectPlayer.gameObject);
 
+            ChangeInputMode(GameManager.InputMode.Player);
+        }
+    }
+    public void Attackstart()
+    {
+        Debug.Log("공격이어야할터...");
+        selectPlayer.GetRange(Pathfinder.PathMode.pA);
+        setGo(selectPlayer.RangeTiles);
+        ChangeInputMode (GameManager.InputMode.Player);
+    }
+    public void enemyTurnChange()
+    {
+
+
+        if (monster.Count - 1 > NowMNum)
+        {
+            //setSelect(monster[++NowMNum].unitTIle);
+            monster[++NowMNum].isSelected = true;
+            Debug.Log($"{NowMNum}:이동");
+        }
+        else
+        {
+            TurnChange(TurnState.playerTurn);
+            StartTurn();
+            PlayerTurnChange();
+            NowMNum = -1;
+        }
     }
     private void MoveTile()
     {
-        HashSet<Tile> goTiles = player[NowPNum].RangeTiles;
+        HashSet<Tile> goTiles = selectPlayer.RangeTiles;
         if (goTiles != null)
         {
             foreach (Tile t in goTiles)
@@ -258,11 +342,11 @@ public class GameManager : MonoBehaviour
             grid[x, y].Setstate(Tile.TileState.Occupied);
             grid[x, y].on = player[i].gameObject;
             player[i].unitNum = i;
-
-            
+           
             player[i].SetDirection(Monster.Direction.right);
-         
+            player[i].Reset();
         }
+        setSelect(player[0].unitTIle);
         //
         //    if (player == null)
         //    {
@@ -277,9 +361,9 @@ public class GameManager : MonoBehaviour
 
 
     }
-    public Player FIndPlayer()
+    public List<Player> FIndPlayer()
     {
-        return player[NowPNum];
+        return player;
     }
     public void SetMonster()
     {
@@ -294,7 +378,7 @@ public class GameManager : MonoBehaviour
             grid[x, y].Setstate(Tile.TileState.Occupied);
             grid[x, y].on = monster[i].gameObject;
             monster[i].unitNum = i;
-   
+            monster[i].Reset();
             if (x > y)
                 monster[i].SetDirection(Monster.Direction.left);
             else

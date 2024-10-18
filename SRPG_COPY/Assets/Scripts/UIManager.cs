@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.UI;
 using TMPro;
+using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
@@ -14,7 +15,8 @@ public class UIManager : MonoBehaviour
     public GameObject battleMenu;
     [SerializeField] private TMP_Text MUnit;
     [SerializeField] private TMP_Text MHP;
-
+    [SerializeField] private Button Bbtn;
+    [SerializeField] private Slider hpS;
     private void Awake()
     {
         if (instance != null)
@@ -23,6 +25,10 @@ public class UIManager : MonoBehaviour
             return;
         }
         instance = this;
+    }
+    public void SelectSkill()
+    {
+
     }
     void Start()
     {
@@ -44,26 +50,44 @@ public class UIManager : MonoBehaviour
         //        break;
         //}
     }
+    
     public void ShowBMenu(UnitP p) {
         battleMenu.SetActive(true);
         MHP.text = $"{p.hp}";
+        hpS.value = p.maxhp / p.hp;
+        Bbtn.GetComponentInChildren<TMP_Text>().text = "Move";
+        Bbtn.onClick.RemoveAllListeners();
+        Bbtn.onClick.AddListener(GameManager.instance.startmove);
+    }
+    public void HideBMenu()
+    {
+        battleMenu.SetActive(false);
+    }
+    public void ShowBAMenu(UnitP p)
+    {
+        battleMenu.SetActive(true);
+        MHP.text = $"{p.hp}";
+        hpS.value = p.maxhp / p.hp;
+        Bbtn.GetComponentInChildren<TMP_Text>().text = "Attack";
+        Bbtn.onClick.RemoveAllListeners();
+        Bbtn.onClick.AddListener(GameManager.instance.Attackstart);
     }
     void Showturn()
     {
         switch (GameManager.instance.turn)
         {
             case GameManager.TurnState.start:
-                turn.text = "시작";
+                turn.text = $"{GameManager.instance.turnN}: 시작";
                
                 break;
             case GameManager.TurnState.playerTurn:
-                turn.text = "플레이어 이동";
+                turn.text = $"{GameManager.instance.turnN}:플레이어 턴";
                 break;
             case GameManager.TurnState.end:
                 turn.text = "종료";
                 break;
             case GameManager.TurnState.enemyTurn:
-                turn.text = "적 턴";
+                turn.text = $"{GameManager.instance.turnN}: 적 턴";
                 break;
         }
     }

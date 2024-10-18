@@ -102,6 +102,8 @@ public class Tile : MonoBehaviour
 
     public void Setstate(TileState _state) {
         state = _state;
+        if(state!=TileState.Occupied)
+            on = null;
     }
     public TileState Getstate()
     {

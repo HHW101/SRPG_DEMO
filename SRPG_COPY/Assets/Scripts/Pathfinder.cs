@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class Pathfinder 
 {
@@ -221,6 +223,21 @@ public class Pathfinder
         } 
 
         return 0;
+    }
+    public List<Tile> findPlayer(Tile mon, List<Player> players)
+    {
+        List<Tile> list = new List<Tile>();
+        foreach (Player player in players) { 
+            list.Add(player.unitTIle);
+        }
+        List<Tile> result = new List<Tile>();
+        foreach (Tile p in list) {
+            List<Tile> temp = FindNext(mon, p, PathMode.mM);
+            Debug.Log(temp.Count);
+            if (temp.Count > 0 && (result.Count==0 ||temp.Count < result.Count))
+                result = temp;
+        }
+        return result;
     }
     
     int GetDistance(Tile tile) {

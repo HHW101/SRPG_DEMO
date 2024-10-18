@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
+using static Pathfinder;
 
 public class Monster : UnitP
 {
 
   
     public bool isAttack = false;
- 
- 
+
+    public Tile selectPlayer;
     // Start is called before the first frame update
     protected  override void  Awake()
     {
@@ -66,8 +67,8 @@ public class Monster : UnitP
     private void MonAttack()
     {
         HashSet<Tile> temp = path.Range(unitTIle, range, Pathfinder.PathMode.mA);
-        if (temp.Contains(GameManager.instance.FIndPlayer().unitTIle))
-            Attack(GameManager.instance.FIndPlayer().gameObject);
+        if (temp.Contains(selectPlayer))
+            Attack(selectPlayer.gameObject);
         else
         {
             isActive = false;
@@ -81,15 +82,21 @@ public class Monster : UnitP
         GameManager.instance.cam.ZoomIn();
       
         List<Tile> temp = new List<Tile>();
-        temp = path.FindNext(unitTIle, GameManager.instance.FIndPlayer().unitTIle,Pathfinder.PathMode.mM);
+        Debug.Log(GameManager.instance.FIndPlayer().Count);
+        temp = path.findPlayer(unitTIle , GameManager.instance.FIndPlayer());
+
         Debug.Log(temp.Count);
+        temp[temp.Count-1] = selectPlayer;
         if(temp.Count>runAble)
             temp = temp.GetRange(0, runAble);
         
         while (temp.Count>0&&temp[temp.Count - 1].state!=Tile.TileState.Idle)
             temp.RemoveAt(temp.Count-1);
         if (temp != null)
+        {
+            unitTIle.Setstate(Tile.TileState.Idle);
             GoTo(temp);
+        }
         
         GameManager.instance.cam.ZoomOut();
     }
@@ -111,7 +118,7 @@ public class Monster : UnitP
                 if (isActive) { return; }
                 if (moveC == 0)
                 {
-                    //moveC++;
+                    moveC++;
                     ChangeState(UnitState.Attack);
                 }
                 isActive = true;

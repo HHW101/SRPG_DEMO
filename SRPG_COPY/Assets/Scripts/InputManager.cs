@@ -92,9 +92,8 @@ public class InputManager : MonoBehaviour
             case GameManager.InputMode.Map:
                 if (context.started)
                 {
-                    GameManager.instance.PlayerTurnChange();
-
-                    GameManager.instance.ChangeInputMode(GameManager.InputMode.Player);
+                    GameManager.instance.SelectPlayer();
+                
                 }
                 break;
             case GameManager.InputMode.block:

@@ -32,12 +32,21 @@ public class Camera : MonoBehaviour
     {
         Target = t;
     }
+    public void mapMode()
+    {
+        transform.position=new Vector3(offsetX, offsetY+10f, offsetZ)+GameManager.instance.SelectCamera();
+    }
     private void FixedUpdate()
     {
-        if(Target != null)
-            transform.position=
-            new Vector3(Target.transform.position.x+offsetX, Target.transform.position.y+offsetY, Target.transform.position.z+offsetZ);
+        if (GameManager.instance.inputmode==GameManager.InputMode.Map)
+            mapMode();
         else
-            transform.position = defaultCam;
+        {
+            if (Target != null)
+                transform.position =
+                new Vector3(Target.transform.position.x + offsetX, Target.transform.position.y + offsetY, Target.transform.position.z + offsetZ);
+            else
+                transform.position = defaultCam;
+        }
     }
 }

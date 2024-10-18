@@ -392,18 +392,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10297631f1079ab428eff52c2cb95bde, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  maxhp: 10
   hp: 10
   range: 1
   isMoving: 0
   isActive: 0
+  isSelected: 0
   runAble: 5
-  unitX: 0
-  unitY: 0
+  atk: 5
+  moveC: 1
+  atkC: 1
+  unitNum: 0
   unitTIle: {fileID: 0}
   dirU: 0
-  monsterNum: 0
-  isAttack: 0
   state: 0
+  isAttack: 0
+  selectPlayer: {fileID: 0}
 --- !u!54 &2410651181235596926
 Rigidbody:
   m_ObjectHideFlags: 0

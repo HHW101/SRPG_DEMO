@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
+using static UnityEditor.Progress;
 /* 유닛들을 조작하는 가상 클래스
  *  모든 유닛이 공유하는 움직임을 줌
  *  플레이어와 적이 차이를 느끼는 건 오버라이드 해주자
@@ -10,7 +11,9 @@ using UnityEngine;
 public class UnitP : MonoBehaviour
 {
     [SerializeField]
+    public float maxhp;
     public float hp;
+    
     [SerializeField]
     public int range;
     protected Animator animator;
@@ -32,6 +35,11 @@ public class UnitP : MonoBehaviour
     protected Pathfinder path = new Pathfinder();
     public UnitState state;
     protected bool isClick=false ;
+
+    //스킬 관련
+    public List<Skill> skill = new List<Skill>();
+
+    
     public enum UnitState
     {
         Idle, AttackThink,Attack, Move,MoveThink, Hit, Die
@@ -43,6 +51,13 @@ public class UnitP : MonoBehaviour
     public enum Direction
     {
         up, down, left, right
+    }
+    public void Reset()
+    {
+        hp = maxhp;
+        moveC = 1;
+        atkC=1;
+        state=UnitState.Idle;
     }
     public void SetDirection(Direction direction)
     {
@@ -166,10 +181,17 @@ public class UnitP : MonoBehaviour
         isActive = false;
         if (--moveC == 0)
         {
-            GameManager.instance.PlayerTurnChange();
-            GameManager.instance.ChangeInputMode(GameManager.InputMode.Map);
+                UIManager.instance.ShowBAMenu(this);
+            state = UnitState.AttackThink;
+            Debug.Log("순서확인");
+            GameManager.instance.ChangeInputMode(GameManager.InputMode.block);
         }
-        GameManager.instance.ChangeInputMode(GameManager.InputMode.Player);
+        else 
+            GameManager.instance.ChangeInputMode(GameManager.InputMode.Player);
+    }
+    protected virtual void ThinkAttack()
+    {
+
     }
     private void CheckDir()
     {
