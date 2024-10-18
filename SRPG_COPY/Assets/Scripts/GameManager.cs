@@ -6,6 +6,7 @@ using Unity.VisualScripting;
 using UnityEditor.Search;
 using UnityEngine;
 using UnityEngine.UIElements;
+using static UnitP;
 using static UnityEngine.GraphicsBuffer;
 
 public class GameManager : MonoBehaviour
@@ -24,15 +25,13 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject obspre;
     private Tile selectTile;
     public Camera cam;
-    private Player[] player=new Player[1];
-    private Monster[] monster=new Monster[3];
+    private List<Player> player = new List<Player>();
+    private List<Monster> monster = new List<Monster>();
     private int TileX;
     private int TileY;
     private bool isRunning;
     public static GameManager instance;
     Pathfinder path;
-    private int monNum;
-    private int playerNum;
     public TurnState turn;
     private int NowPNum =-1;
     private int NowMNum =-1;
@@ -40,7 +39,15 @@ public class GameManager : MonoBehaviour
     {
         start, playerTurn, enemyTurn, end
     }
-
+    public InputMode inputmode;
+    public enum InputMode
+    {
+        Player, Map, Menu, block
+    }
+    public void ChangeInputMode(InputMode mode)
+    {
+        inputmode = mode;
+    }
     public void resetF()
     {
         foreach(var tile in grid)
@@ -65,8 +72,7 @@ public class GameManager : MonoBehaviour
         SetPlayer();
         SetMonster();
         path = new Pathfinder();
-        monNum = 3;
-        playerNum = 1;
+        inputmode = InputMode.Map;
     }
     public void TurnChange(TurnState state)
     {
@@ -87,8 +93,12 @@ public class GameManager : MonoBehaviour
     public void ClickTile()
     {
         Debug.Log(NowPNum);
-        if (player[NowPNum].state==UnitP.UnitState.MoveThink)
+        if (player[NowPNum].state == UnitP.UnitState.MoveThink)
+        {
             player[NowPNum].movePlayer(selectTile);
+            player[NowPNum].ChangeState(UnitP.UnitState.Move);
+            GameManager.instance.ChangeInputMode(GameManager.InputMode.block);
+        }
     }
     public void setSelect(Tile t)
     {
@@ -128,6 +138,7 @@ public class GameManager : MonoBehaviour
     {
         setGo(player[NowPNum].RangeTiles);
         UIManager.instance.battleMenu.SetActive(false);
+        player[NowPNum].ChangeState(UnitState.MoveThink);
     }
     public void setGo(HashSet<Tile> tiles)
     {
@@ -147,10 +158,19 @@ public class GameManager : MonoBehaviour
     
     public void PlayerTurnChange()
     {
-        setSelect(player[++NowPNum].unitTIle);
-        player[NowPNum].GetRange(Pathfinder.PathMode.pM);
-        UIManager.instance.ShowBMenu(player[NowPNum]);
-        Debug.Log($"{NowPNum}:{player[NowPNum].RangeTiles.Count}");
+        Debug.Log($"{player.Count},{NowPNum}");
+        if (player.Count-1 > NowPNum)
+        {
+            setSelect(player[++NowPNum].unitTIle);
+            player[NowPNum].GetRange(Pathfinder.PathMode.pM);
+            UIManager.instance.ShowBMenu(player[NowPNum]);
+            Debug.Log($"{NowPNum}:{player[NowPNum].RangeTiles.Count}");
+        }
+        else
+        {
+            TurnChange(TurnState.enemyTurn);
+            NowPNum=-1;
+        }
 
     }
     private void MoveTile()
@@ -233,7 +253,7 @@ public class GameManager : MonoBehaviour
 
             int x = (int)playerPos[i].x;
             int y = (int)playerPos[i].y;
-            player[i] = Instantiate(PlayerPre, new Vector3(x * 4, 0.2f, y * 4), Quaternion.identity);
+            player.Add(Instantiate(PlayerPre, new Vector3(x * 4, 0.2f, y * 4), Quaternion.identity));
             player[i].unitTIle = grid[x, y];
             grid[x, y].Setstate(Tile.TileState.Occupied);
             grid[x, y].on = player[i].gameObject;
@@ -269,7 +289,7 @@ public class GameManager : MonoBehaviour
             
             int x = (int)monspawnPos[i].x;
             int y = (int)monspawnPos[i].y;
-            monster[i] = Instantiate(MonsterPre, new Vector3(x*4, 0.2f, y*4), Quaternion.identity);
+            monster.Add(Instantiate(MonsterPre, new Vector3(x*4, 0.2f, y*4), Quaternion.identity));
             monster[i].unitTIle = grid[x, y];
             grid[x, y].Setstate(Tile.TileState.Occupied);
             grid[x, y].on = monster[i].gameObject;

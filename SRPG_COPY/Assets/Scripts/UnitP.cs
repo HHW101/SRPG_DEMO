@@ -105,12 +105,12 @@ public class UnitP : MonoBehaviour
         if (s == Pathfinder.PathMode.pA || s == Pathfinder.PathMode.mA)
         {
             RangeTiles = path.Range(unitTIle, range, s);
-            ChangeState(UnitState.AttackThink);
+           // ChangeState(UnitState.AttackThink);
         }
         else
         {
             RangeTiles = path.Range(unitTIle, runAble, s);
-            ChangeState(UnitState.AttackThink);
+           
         }
         Debug.Log($":{RangeTiles.Count}");
     }
@@ -164,7 +164,12 @@ public class UnitP : MonoBehaviour
         CheckDir();
         GameManager.instance.cam.ZoomOut();
         isActive = false;
-        moveC--;
+        if (--moveC == 0)
+        {
+            GameManager.instance.PlayerTurnChange();
+            GameManager.instance.ChangeInputMode(GameManager.InputMode.Map);
+        }
+        GameManager.instance.ChangeInputMode(GameManager.InputMode.Player);
     }
     private void CheckDir()
     {

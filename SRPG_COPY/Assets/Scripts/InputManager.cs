@@ -14,17 +14,17 @@ public class InputManager : MonoBehaviour
     // Start is called before the first frame update
     InputManager _inputManager;
     Vector2 inputM;
-    public enum InputMode{
-        Player,Map,Menu,block
-    }
-    private InputMode mode;
+
+  
     private void Awake()
     {
+        
         _controls = new MapControl();
         moveaction = _controls.SelectTile.Move;
         clickaction = _controls.SelectTile.Click;
-        mode = InputMode.Map;
+       
     }
+
     void Start()
     {
         
@@ -55,49 +55,52 @@ public class InputManager : MonoBehaviour
     public void OnMove(InputAction.CallbackContext context)
     {
         inputM = context.ReadValue<Vector2>();
-        switch (mode)
+        switch (GameManager.instance.inputmode)
         {
-            case InputMode.Player:
+            case GameManager.InputMode.Player:
                 if (inputM != null)
                 {
                   
                     GameManager.instance.ShiftSelect((int)inputM.x, (int)inputM.y,1);
                 }
                 break;
-            case InputMode.Map:
+            case GameManager.InputMode.Map:
                 if (inputM != null)
                 {
                
                     GameManager.instance.ShiftSelect((int)inputM.x, (int)inputM.y,0);
                 }
                 break;
+            case GameManager.InputMode.block:
+                break;
         }
     
         
     }
-    public void ChangeInputMode(InputMode _mode)
-    {
-        mode = _mode;
-    }
+  
     public void OnClick(InputAction.CallbackContext context)
     {
-        switch (mode)
+        switch (GameManager.instance.inputmode)
         {
-            case InputMode.Player:
+            case GameManager.InputMode.Player:
                 if (context.started) //처음 눌린 순만. performed- :계속 canceled 떨어졌을 때
                 {
                     //ChangeInputMode(InputMode.Map);
                     GameManager.instance.ClickTile();
                 }
                 break;
-            case InputMode.Map:
+            case GameManager.InputMode.Map:
                 if (context.started)
                 {
                     GameManager.instance.PlayerTurnChange();
-                   
-                    ChangeInputMode(InputMode.Player);
+
+                    GameManager.instance.ChangeInputMode(GameManager.InputMode.Player);
                 }
                 break;
+            case GameManager.InputMode.block:
+                
+                break;
+
         }
      }
     public void OnCancel(InputAction.CallbackContext context) { 
