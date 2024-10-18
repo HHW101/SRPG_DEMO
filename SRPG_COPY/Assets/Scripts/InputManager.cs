@@ -1,20 +1,29 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 using static MapControl;
 public class InputManager : MonoBehaviour
 {
     private MapControl _controls;  // PlayerControls 객체 선언
-    InputAction selectaction;
+    InputAction moveaction;
+    InputAction clickaction;
     // Start is called before the first frame update
     InputManager _inputManager;
     Vector2 inputM;
+    public enum InputMode{
+        Player,Map,Menu,block
+    }
+    private InputMode mode;
     private void Awake()
     {
         _controls = new MapControl();
-        selectaction = _controls.SelectTile.Move;
+        moveaction = _controls.SelectTile.Move;
+        clickaction = _controls.SelectTile.Click;
+        mode = InputMode.Map;
     }
     void Start()
     {
@@ -22,15 +31,17 @@ public class InputManager : MonoBehaviour
     }
     void OnDisable()
     {
-        selectaction.Disable();
+        moveaction.Disable();
+        clickaction.Disable();
     }
     void OnEnable()
     {
-        selectaction.Enable();
-        selectaction.performed += OnMove;
-        selectaction.performed += OnClick;
-        selectaction.performed += OnCancel;
-        selectaction.performed += OnOpenMenu;
+        moveaction.Enable();
+        moveaction.performed += OnMove;
+        clickaction.Enable();
+        clickaction.started += OnClick;
+       // selectaction.performed += OnCancel;
+        //selectaction.performed += OnOpenMenu;
     }
     private void FixedUpdate()
     {
@@ -40,19 +51,55 @@ public class InputManager : MonoBehaviour
     {
         
     }
-
+    
     public void OnMove(InputAction.CallbackContext context)
     {
-        inputM =context.ReadValue<Vector2>();
-        if (inputM != null) {
-            Debug.Log($"{inputM.x}:{inputM.y}");
-            GameManager.instance.ShiftSelect((int)inputM.x,(int)inputM.y);
+        inputM = context.ReadValue<Vector2>();
+        switch (mode)
+        {
+            case InputMode.Player:
+                if (inputM != null)
+                {
+                  
+                    GameManager.instance.ShiftSelect((int)inputM.x, (int)inputM.y,1);
+                }
+                break;
+            case InputMode.Map:
+                if (inputM != null)
+                {
+               
+                    GameManager.instance.ShiftSelect((int)inputM.x, (int)inputM.y,0);
+                }
+                break;
         }
+    
+        
+    }
+    public void ChangeInputMode(InputMode _mode)
+    {
+        mode = _mode;
     }
     public void OnClick(InputAction.CallbackContext context)
     {
-
-    }
+        switch (mode)
+        {
+            case InputMode.Player:
+                if (context.started) //처음 눌린 순만. performed- :계속 canceled 떨어졌을 때
+                {
+                    //ChangeInputMode(InputMode.Map);
+                    GameManager.instance.ClickTile();
+                }
+                break;
+            case InputMode.Map:
+                if (context.started)
+                {
+                    GameManager.instance.PlayerTurnChange();
+                   
+                    ChangeInputMode(InputMode.Player);
+                }
+                break;
+        }
+     }
     public void OnCancel(InputAction.CallbackContext context) { 
     }
     public void OnOpenMenu(InputAction.CallbackContext context)

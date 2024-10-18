@@ -8,10 +8,11 @@ public class Camera : MonoBehaviour
     public float offsetX;
     public float offsetY;
     public float offsetZ;
+    private Vector3  defaultCam = new Vector3(27f,20f,3f);
     // Start is called before the first frame update
     void Start()
     {
-        Target = GameManager.instance.FIndPlayer().gameObject;
+        //Target = GameManager.instance.FIndPlayer().gameObject;
     }
 
     // Update is called once per frame
@@ -33,9 +34,10 @@ public class Camera : MonoBehaviour
     }
     private void FixedUpdate()
     {
-        
-        transform.position=
+        if(Target != null)
+            transform.position=
             new Vector3(Target.transform.position.x+offsetX, Target.transform.position.y+offsetY, Target.transform.position.z+offsetZ);
-        
+        else
+            transform.position = defaultCam;
     }
 }

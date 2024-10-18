@@ -19,20 +19,27 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Monster MonsterPre;
     [SerializeField] private float speed=2.0f;
     [SerializeField] private Vector2[] monspawnPos = new Vector2[5];
+    [SerializeField] private Vector2[] playerPos = new Vector2[1];
     [SerializeField] private Vector2[] obspawnPos = new Vector2[5];
     [SerializeField] private GameObject obspre;
-    public bool canClick =true;
     private Tile selectTile;
     public Camera cam;
-    private HashSet<Tile> goTiles = new HashSet<Tile>();
-    private Player player;
+    private Player[] player=new Player[1];
     private Monster[] monster=new Monster[3];
     private int TileX;
     private int TileY;
     private bool isRunning;
     public static GameManager instance;
     Pathfinder path;
-
+    private int monNum;
+    private int playerNum;
+    public TurnState turn;
+    private int NowPNum =-1;
+    private int NowMNum =-1;
+    public enum TurnState
+    {
+        start, playerTurn, enemyTurn, end
+    }
 
     public void resetF()
     {
@@ -53,88 +60,62 @@ public class GameManager : MonoBehaviour
             return;
         }
         instance = this;
-        isRunning = false;
         grid = new Tile[GridX, GridY];
         makeMap();
-        SetPlayer(0,2);
+        SetPlayer();
         SetMonster();
         path = new Pathfinder();
+        monNum = 3;
+        playerNum = 1;
+    }
+    public void TurnChange(TurnState state)
+    {
+        turn = state;
     }
     private void Update()
     {
-        if (!canClick)
-            return;
-        switch (TurnManager.instance.turn)
-        {
-            case TurnManager.TurnState.pMoveTurn:
-                
-                GameManager.instance.cam.ChangeTarget(player.gameObject);
-                Moving();
-                
-                break;
-            case TurnManager.TurnState.pAttackTurn:
-                Attack();
-               
-                break;
-        }
+        if (Input.GetKeyDown(KeyCode.P))
+            TurnChange(TurnState.playerTurn);
+        if (Input.GetKeyDown(KeyCode.X))
+            TurnChange(TurnState.enemyTurn);
+     
     }
-
-    public void Attack()
+    private void StartGame()
     {
-        
-        if (Input.GetKeyDown(KeyCode.Z))
-        {
-            if (!isRunning)
-            {
-                selectTile.SetPState(Tile.PState.Select);
-            
-                player.GetRange(Pathfinder.PathMode.pA);
-                isRunning = true;
-            }
-            else if(selectTile.state==Tile.TileState.Occupied)
-            {
-                player.Attack(selectTile.on);
-                canClick = false;
-                isRunning = false;
-            }
-        }
-      
+        setSelect(player[NowPNum].unitTIle);
     }
-    private void Moving()
+    public void ClickTile()
     {
-          if (Input.GetKeyDown(KeyCode.Z))
-        {
-            if (!isRunning)
-            {
-                selectTile.SetPState(Tile.PState.Select);
-                //getCango(selectTile.getX(), selectTile.getY());
-                player.GetRange(Pathfinder.PathMode.pM);
-                isRunning = true;
-            }
-            else
-            {
-                ClickTile();
-                isRunning = false;
-                canClick = false;
-            }
-        }
+        Debug.Log(NowPNum);
+        if (player[NowPNum].state==UnitP.UnitState.MoveThink)
+            player[NowPNum].movePlayer(selectTile);
     }
     public void setSelect(Tile t)
     {
+        if (selectTile != null)
+            selectTile.Setstate(Tile.TileState.Idle);
         selectTile = t;
         selectTile.SetPState(Tile.PState.Select);
+        cam.ChangeTarget(player[NowPNum].gameObject);
     }
-    public void ShiftSelect(int x,int y)
+    public void goToTile(Tile tile)
     {
-      
+        selectTile.SetPState(Tile.PState.Idle);
+        selectTile = tile;
+        selectTile.SetPState(Tile.PState.Select);
+        UIManager.instance.ShowTile(selectTile);
+    }
+    public void ShiftSelect(int x,int y,int mode) // 0: 맵 기준 타일 선택 1: 플레이어 기준 타일 선택
+    {
+            
         int nx=selectTile.getX()+x;
         int ny=selectTile.getY()+y;
         Debug.Log($"{nx}:{ny}");
-        if (nx<0||ny<0|| nx>GridX||ny>GridY|| grid[nx,ny] == null)
+        if (getTile(nx,ny) == null)
             return;
-        if (!goTiles.Contains(grid[nx, ny]))
+        if (mode==1&&!player[NowPNum].RangeTiles.Contains(grid[nx, ny]))
             return;
-        if (goTiles.Contains(selectTile))
+        if (mode == 1 && player[NowPNum].RangeTiles.Contains(selectTile))
             selectTile.SetPState(Tile.PState.CanGO);
         else
             selectTile.SetPState(Tile.PState.Idle);
@@ -143,38 +124,17 @@ public class GameManager : MonoBehaviour
         selectTile.SetPState(Tile.PState.Select);
         UIManager.instance.ShowTile(selectTile);
     }
-    public HashSet<Tile> GetRange(int x, int y, int cnt,Pathfinder.PathMode mode)
+    public void startmove()
     {
-
-        //range.Add(getTile(x, y));
-
-        //for (int dx = -cnt; dx <= cnt; dx++)
-        //{
-        //    for (int dy = -cnt; dy <= cnt; dy++)
-        //    {
-        //        if (math.abs(dx) + math.abs(dy) <= cnt)
-        //            if (getTile(x + dx, y + dy) != null)
-        //                range.Add(getTile(x + dx, y + dy));
-
-        //    }
-        //}
-        return path.Range(getTile(x, y), cnt,mode);
+        setGo(player[NowPNum].RangeTiles);
+        UIManager.instance.battleMenu.SetActive(false);
     }
     public void setGo(HashSet<Tile> tiles)
     {
-        if (goTiles != null)
+      
+        if (tiles != null)
         {
-            foreach (Tile t in goTiles)
-            {
-                if (t != null)
-                    t.SetPState(Tile.PState.Idle);
-            }
-        }
-        goTiles.Clear();
-        goTiles = tiles;
-        if (goTiles != null)
-        {
-            foreach (Tile t in goTiles)
+            foreach (Tile t in tiles)
             {
 
                 if (t != null)
@@ -184,32 +144,18 @@ public class GameManager : MonoBehaviour
         selectTile.SetPState(Tile.PState.Select);
     }
  
-    private void Cango(int x,int y,int cnt)
+    
+    public void PlayerTurnChange()
     {
-        if (cnt == 0) return;
-        for(int i = -1; i <= 1; i += 2)
-        {
-            
-                if (getTile(x + i, y) != null )
-                {
-                    goTiles.Add(getTile(x + i, y));
-                    Cango(x + i, y, cnt - 1);
-            }
-        }
-        for (int i = -1; i <= 1; i += 2)
-        {
-            if (getTile(x , y+i) != null )
-            {
-                goTiles.Add(getTile(x, y+i));
-                Cango(x , y+i, cnt - 1);
-        
-            }
-        }
+        setSelect(player[++NowPNum].unitTIle);
+        player[NowPNum].GetRange(Pathfinder.PathMode.pM);
+        UIManager.instance.ShowBMenu(player[NowPNum]);
+        Debug.Log($"{NowPNum}:{player[NowPNum].RangeTiles.Count}");
+
     }
-    private void ClickTile()
+    private void MoveTile()
     {
-        movePlayer();
-        TurnManager.instance.TurnChange(TurnManager.TurnState.pAttackTurn);
+        HashSet<Tile> goTiles = player[NowPNum].RangeTiles;
         if (goTiles != null)
         {
             foreach (Tile t in goTiles)
@@ -219,23 +165,8 @@ public class GameManager : MonoBehaviour
             }
         }
         goTiles.Clear();
-
-
-        //StartCoroutine(MovePlayer(selectTile.getX(), selectTile.getY()));
     }
-    private void movePlayer()
-    {
-        //player.GoTo(selectTile.transform.position);
-        
-        List<Tile> temp = new List<Tile>();    
-        temp=path.FindNext(player.unitTIle, selectTile,Pathfinder.PathMode.pM);
-        if (temp != null)
-            player.GoTo(temp);
-        player.unitX=selectTile.getX();
-        player.unitY=selectTile.getY();
-       
-
-    }
+   
     public Tile getTile(int x, int y)
     {
         if(x< 0 || y < 0||x>=GridX||y>=GridY) return null;
@@ -296,25 +227,39 @@ public class GameManager : MonoBehaviour
         //}
     }
 
-    public void SetPlayer(int x, int y)
-    {
-        if (player == null)
+    public void SetPlayer() {
+        for (int i = 0; i <playerPos.Length; i++)
         {
-            player = Instantiate(PlayerPre, new Vector3(x * 4, 0.2f, y * 4), Quaternion.identity);
+
+            int x = (int)playerPos[i].x;
+            int y = (int)playerPos[i].y;
+            player[i] = Instantiate(PlayerPre, new Vector3(x * 4, 0.2f, y * 4), Quaternion.identity);
+            player[i].unitTIle = grid[x, y];
+            grid[x, y].Setstate(Tile.TileState.Occupied);
+            grid[x, y].on = player[i].gameObject;
+            player[i].unitNum = i;
+
+            
+            player[i].SetDirection(Monster.Direction.right);
+         
         }
-      
-        player.unitX = x; player.unitY = y;
-        
-        player.unitTIle = grid[x, y];
-        grid[x,y].Setstate(Tile.TileState.Occupied);
-        grid[x,y].on = player.gameObject;
-        player.SetDirection(UnitP.Direction.right);
-        setSelect(player.unitTIle);
+        //
+        //    if (player == null)
+        //    {
+        //        player = Instantiate(PlayerPre, new Vector3(x * 4, 0.2f, y * 4), Quaternion.identity);
+        //    }
+
+
+        //    player.unitTIle = grid[x, y];
+        //    grid[x,y].Setstate(Tile.TileState.Occupied);
+        //    grid[x,y].on = player.gameObject;
+        //    player.SetDirection(UnitP.Direction.right);
+
 
     }
     public Player FIndPlayer()
     {
-        return player;
+        return player[NowPNum];
     }
     public void SetMonster()
     {
@@ -328,9 +273,8 @@ public class GameManager : MonoBehaviour
             monster[i].unitTIle = grid[x, y];
             grid[x, y].Setstate(Tile.TileState.Occupied);
             grid[x, y].on = monster[i].gameObject;
-            monster[i].monsterNum = i;
-            monster[i].unitX = x;
-            monster[i].unitY = y;
+            monster[i].unitNum = i;
+   
             if (x > y)
                 monster[i].SetDirection(Monster.Direction.left);
             else

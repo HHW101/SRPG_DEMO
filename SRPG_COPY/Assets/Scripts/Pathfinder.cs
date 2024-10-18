@@ -35,6 +35,7 @@ public class Pathfinder
             if (currentTIle.gCost ==cnt) { continue; }
             for (int i = 0; i < 4; i++)
             {
+               
                 if (currentTIle.getDir(i))
                     continue;
                 Tile tempTIle = GameManager.instance.getTile(currentTIle.getX() + dx[i], currentTIle.getY() + dy[i]);
@@ -49,7 +50,7 @@ public class Pathfinder
                             case PathMode.pM:
                                 if (tempTIle.on.GetComponent<Monster>() != null)
                                 {
-                                    Debug.Log("체크");
+                                  
                                     continue;
                                 }
                                 break;
@@ -78,6 +79,7 @@ public class Pathfinder
            
         }
         GameManager.instance.resetF();
+        Debug.Log($"총개수: {closedTiles.Count}");
         return closedTiles;
     }
     public List<Tile> FindNext(Tile startTile, Tile endTile, PathMode mode)

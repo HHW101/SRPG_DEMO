@@ -9,7 +9,11 @@ public class UIManager : MonoBehaviour
     // Start is called before the first frame update
     [SerializeField] private TMP_Text turn;
     [SerializeField] private TMP_Text tile;
+    [SerializeField] private TMP_Text moveC;
     public static UIManager instance;
+    public GameObject battleMenu;
+    [SerializeField] private TMP_Text MUnit;
+    [SerializeField] private TMP_Text MHP;
 
     private void Awake()
     {
@@ -23,30 +27,42 @@ public class UIManager : MonoBehaviour
     void Start()
     {
         tile.enabled = false;
+        battleMenu.SetActive(false);
     }
     public void ShowTile(Tile t)
     {
+      
         tile.enabled = true;
         tile.text = $"[{t.getX()},{t.getY()}]\n비용:{t.moveCost}";
     }
+    
+    public void ShowC(UnitP p)
+    {
+        //switch (TurnManager.instance.turn)
+        //{
+        //    case TurnManager.TurnState.pMoveTurn:
+        //        break;
+        //}
+    }
+    public void ShowBMenu(UnitP p) {
+        battleMenu.SetActive(true);
+        MHP.text = $"{p.hp}";
+    }
     void Showturn()
     {
-        switch (TurnManager.instance.turn)
+        switch (GameManager.instance.turn)
         {
-            case TurnManager.TurnState.start:
+            case GameManager.TurnState.start:
                 turn.text = "시작";
+               
                 break;
-            case TurnManager.TurnState.pAttackTurn:
-                turn.text = "플레이어 공격";
-                tile.enabled=false;
-                break;
-            case TurnManager.TurnState.pMoveTurn:
+            case GameManager.TurnState.playerTurn:
                 turn.text = "플레이어 이동";
                 break;
-            case TurnManager.TurnState.end:
+            case GameManager.TurnState.end:
                 turn.text = "종료";
                 break;
-            case TurnManager.TurnState.enemyTurn:
+            case GameManager.TurnState.enemyTurn:
                 turn.text = "적 턴";
                 break;
         }

@@ -7,13 +7,10 @@ using UnityEngine.UIElements;
 public class Monster : UnitP
 {
 
-    public int monsterNum;
+  
     public bool isAttack = false;
-    public enum MonsterState
-    {
-        Idle, Attack, Move, Hit,Die
-    }
-    public MonsterState state;
+ 
+ 
     // Start is called before the first frame update
     protected  override void  Awake()
     {
@@ -31,11 +28,17 @@ public class Monster : UnitP
         Vector3 p = gameObject.transform.position;
         animator.SetBool("isAttack", true);
         Debug.Log($"{gameObject}가 {a}를 공격");
+        StartCoroutine(AttackAni(a));
         
+    }
+    private IEnumerator AttackAni(GameObject target)
+    {
+        while(!animator.IsInTransition(0))
+            yield return null;
         animator.SetBool("isAttack", false);
-        TurnManager.instance.TurnChange(TurnManager.TurnState.pMoveTurn);
+        GameManager.instance.TurnChange(GameManager.TurnState.playerTurn);
         isActive = false;
-        ChangeState(MonsterState.Attack);
+         atkC--;
     }
     public override void Damaged(float x)
     {
@@ -52,39 +55,38 @@ public class Monster : UnitP
     {
         unitTIle.Setstate(Tile.TileState.Idle);
         animator.SetBool("isDie", true);
+        StartCoroutine(DeadAni());
+    }
+    private IEnumerator DeadAni()
+    {
+        yield return new WaitForSeconds(animator.GetCurrentAnimatorClipInfo(0).Length);
         Destroy(gameObject);
     }
-    public void ChangeState(MonsterState _state)
-    {
-        state= _state;
-    }
+  
     private void MonAttack()
     {
-        HashSet<Tile> temp = GameManager.instance.GetRange(unitX, unitY, range, Pathfinder.PathMode.mA);
-        Debug.Log("몬스터 공격"+temp.Count+" "+temp);
-        Debug.Log($"가지고 있나? {temp.Contains(GameManager.instance.FIndPlayer().unitTIle)}");
+        HashSet<Tile> temp = path.Range(unitTIle, range, Pathfinder.PathMode.mA);
         if (temp.Contains(GameManager.instance.FIndPlayer().unitTIle))
             Attack(GameManager.instance.FIndPlayer().gameObject);
         else
         {
             isActive = false;
-            TurnManager.instance.TurnChange(TurnManager.TurnState.pMoveTurn);
-            ChangeState(MonsterState.Idle);
-            
+            atkC--;
+
         }
     }
     public void Findplayer()
     {
         GameManager.instance.cam.ChangeTarget(gameObject);
         GameManager.instance.cam.ZoomIn();
-        Pathfinder path = new Pathfinder();
+      
         List<Tile> temp = new List<Tile>();
         temp = path.FindNext(unitTIle, GameManager.instance.FIndPlayer().unitTIle,Pathfinder.PathMode.mM);
         Debug.Log(temp.Count);
         if(temp.Count>runAble)
             temp = temp.GetRange(0, runAble);
         
-        while (temp[temp.Count - 1].state!=Tile.TileState.Idle)
+        while (temp.Count>0&&temp[temp.Count - 1].state!=Tile.TileState.Idle)
             temp.RemoveAt(temp.Count-1);
         if (temp != null)
             GoTo(temp);
@@ -94,36 +96,42 @@ public class Monster : UnitP
     // Update is called once per frame
     void Update()
     {
-        if (TurnManager.instance.turn != TurnManager.TurnState.enemyTurn||monsterNum!=0)
+        if (!isSelected)
             return;
         
         switch (state)
         {
 
-            case MonsterState.Idle:
+            case UnitState.Idle:
                 if (hp <= 0)
-                    ChangeState(MonsterState.Die);
-                 ChangeState(MonsterState.Move);
+                    ChangeState(UnitState.Die);
+                 ChangeState(UnitState.Move);
                 break;
-            case MonsterState.Attack:
+            case UnitState.Move:
+                if (isActive) { return; }
+                if (moveC == 0)
+                {
+                    //moveC++;
+                    ChangeState(UnitState.Attack);
+                }
+                isActive = true;
+                Findplayer();
+
+
+                break;
+            case UnitState.AttackThink:
+                break;
+            case UnitState.Attack:
                 if (isActive) { return; }
                 isActive = true;
                 MonAttack();
                
                 break;
-            case MonsterState.Move:
-                if (isActive) { return; }
-                ChangeState(MonsterState.Attack);
-                isActive = true;
-
-                Findplayer();
-                
+        
+            case UnitState.Hit:
                 
                 break;
-            case MonsterState.Hit:
-                
-                break;
-            case MonsterState.Die:
+            case UnitState.Die:
                 Dead();
                 break;
         }

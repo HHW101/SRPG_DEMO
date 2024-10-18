@@ -10,25 +10,36 @@ using UnityEngine;
 public class UnitP : MonoBehaviour
 {
     [SerializeField]
-    protected float hp;
+    public float hp;
     [SerializeField]
     public int range;
     protected Animator animator;
     public bool isMoving;
     public bool isActive=false;
+    public bool isSelected = false;
     protected float moveSpeed = 2f;
     public int runAble;
-    public int unitX;
-    public int unitY;
     [SerializeField]
     private float atk =5;
     [SerializeField]
     public int moveC = 1;
     [SerializeField]
     public int atkC = 1;
-    protected HashSet<Tile> RangeTiles = new HashSet<Tile>();
+    public int unitNum;
+    public HashSet<Tile> RangeTiles = new HashSet<Tile>();
     public Tile unitTIle;
     public Direction dirU;
+    protected Pathfinder path = new Pathfinder();
+    public UnitState state;
+    protected bool isClick=false ;
+    public enum UnitState
+    {
+        Idle, AttackThink,Attack, Move,MoveThink, Hit, Die
+    }
+    public void ChangeState(UnitState _state)
+    {
+        state = _state;
+    }
     public enum Direction
     {
         up, down, left, right
@@ -91,12 +102,17 @@ public class UnitP : MonoBehaviour
     public virtual void GetRange(Pathfinder.PathMode s)
     {
 
-        if(s==Pathfinder.PathMode.pA||s==Pathfinder.PathMode.mA)
-            RangeTiles = GameManager.instance.GetRange(unitX, unitY, range,s);
-         else
-            RangeTiles = GameManager.instance.GetRange(unitX, unitY, runAble, s);
-
-
+        if (s == Pathfinder.PathMode.pA || s == Pathfinder.PathMode.mA)
+        {
+            RangeTiles = path.Range(unitTIle, range, s);
+            ChangeState(UnitState.AttackThink);
+        }
+        else
+        {
+            RangeTiles = path.Range(unitTIle, runAble, s);
+            ChangeState(UnitState.AttackThink);
+        }
+        Debug.Log($":{RangeTiles.Count}");
     }
     private IEnumerator MovePlayer(Vector3 direction)
     {
@@ -140,16 +156,15 @@ public class UnitP : MonoBehaviour
             unitTIle = tile;
             
         }
-
+        for (int i = 0; i < 2; i++) {
+            yield return new WaitForSeconds(1f);
+        }
         unitTIle.state = Tile.TileState.Occupied;
         unitTIle.on = gameObject;
         CheckDir();
         GameManager.instance.cam.ZoomOut();
-        unitX = unitTIle.getX();
-        unitY = unitTIle.getY();
-        if (TurnManager.instance.turn!=TurnManager.TurnState.enemyTurn)
-            GameManager.instance.canClick = true;
         isActive = false;
+        moveC--;
     }
     private void CheckDir()
     {
