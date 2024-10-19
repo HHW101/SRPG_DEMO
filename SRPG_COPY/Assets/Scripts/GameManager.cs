@@ -69,6 +69,10 @@ public class GameManager : MonoBehaviour
     {
         turnN++;
         Debug.Log(turnN);
+        foreach(Player p in player)
+            p.TReset();
+        foreach(Monster m in monster)
+            m.TReset();
         TurnChange(TurnState.playerTurn);
     }
     private void Awake()
@@ -93,6 +97,8 @@ public class GameManager : MonoBehaviour
     public void TurnChange(TurnState state)
     {
         turn = state;
+        if(state==TurnState.enemyTurn)
+            ChangeInputMode(InputMode.block);
     }
     private void Update()
     {
@@ -246,12 +252,16 @@ public class GameManager : MonoBehaviour
         if (monster.Count - 1 > NowMNum)
         {
             //setSelect(monster[++NowMNum].unitTIle);
+            if(NowMNum>=0)
+                monster[NowMNum].isSelected = false;
             monster[++NowMNum].isSelected = true;
+            monster[NowMNum].isActive = false;
             Debug.Log($"{NowMNum}:이동");
         }
         else
         {
             TurnChange(TurnState.playerTurn);
+            monster[NowMNum].isSelected = false;
             StartTurn();
             PlayerTurnChange();
             NowMNum = -1;
@@ -344,7 +354,7 @@ public class GameManager : MonoBehaviour
             player[i].unitNum = i;
            
             player[i].SetDirection(Monster.Direction.right);
-            player[i].Reset();
+            player[i].GReset();
         }
         setSelect(player[0].unitTIle);
         //
@@ -378,7 +388,7 @@ public class GameManager : MonoBehaviour
             grid[x, y].Setstate(Tile.TileState.Occupied);
             grid[x, y].on = monster[i].gameObject;
             monster[i].unitNum = i;
-            monster[i].Reset();
+            monster[i].GReset();
             if (x > y)
                 monster[i].SetDirection(Monster.Direction.left);
             else
@@ -386,7 +396,13 @@ public class GameManager : MonoBehaviour
         }
        
     }
-  
+    public void RemoveUnit(GameObject unit)
+    {
+        if(unit.GetComponent<Player>() != null)
+            player.Remove(unit.GetComponent<Player>());
+        else
+            monster.Remove(unit.GetComponent<Monster>());
+    }
 
 
 }

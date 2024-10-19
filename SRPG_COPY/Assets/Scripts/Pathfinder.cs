@@ -233,10 +233,10 @@ public class Pathfinder
         List<Tile> result = new List<Tile>();
         foreach (Tile p in list) {
             List<Tile> temp = FindNext(mon, p, PathMode.mM);
-            Debug.Log(temp.Count);
             if (temp.Count > 0 && (result.Count==0 ||temp.Count < result.Count))
                 result = temp;
         }
+     
         return result;
     }
     

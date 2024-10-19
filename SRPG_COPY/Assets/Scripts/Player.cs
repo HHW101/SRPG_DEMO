@@ -28,12 +28,13 @@ public class Player : UnitP
     public override void Attack(GameObject a)
     {
         base.Attack(a);
+        atkC--;
         Debug.Log($"플레이어가 {a}를 공격");
         foreach (Tile t in RangeTiles)
         {
             t.SetPState(Tile.PState.Idle);
         }
-        if (--atkC == 0)
+        if (atkC == 0)
         {
             UIManager.instance.HideBMenu();
             GameManager.instance.PlayerTurnChange();
@@ -71,6 +72,7 @@ public class Player : UnitP
         unitTIle.Setstate(Tile.TileState.Idle);
         List<Tile> temp = new List<Tile>();
         temp = path.FindNext(unitTIle, selectTile, Pathfinder.PathMode.pM);
+        moveC--;
         if (temp != null)
             GoTo(temp);
         foreach(Tile t in RangeTiles)

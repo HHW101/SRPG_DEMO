@@ -11,7 +11,7 @@ public class Monster : UnitP
   
     public bool isAttack = false;
 
-    public Tile selectPlayer;
+    public Player selectPlayer;
     // Start is called before the first frame update
     protected  override void  Awake()
     {
@@ -27,19 +27,19 @@ public class Monster : UnitP
     {
         base.Attack(a);
         Vector3 p = gameObject.transform.position;
-        animator.SetBool("isAttack", true);
+     
         Debug.Log($"{gameObject}가 {a}를 공격");
         StartCoroutine(AttackAni(a));
-        
+
     }
     private IEnumerator AttackAni(GameObject target)
     {
-        while(!animator.IsInTransition(0))
-            yield return null;
+        animator.SetBool("isAttack", true);
+        yield return new WaitForSeconds(animator.GetCurrentAnimatorClipInfo(0).Length); ;
         animator.SetBool("isAttack", false);
         GameManager.instance.TurnChange(GameManager.TurnState.playerTurn);
         isActive = false;
-         atkC--;
+     
     }
     public override void Damaged(float x)
     {
@@ -61,18 +61,20 @@ public class Monster : UnitP
     private IEnumerator DeadAni()
     {
         yield return new WaitForSeconds(animator.GetCurrentAnimatorClipInfo(0).Length);
+        GameManager.instance.RemoveUnit(gameObject);
         Destroy(gameObject);
     }
   
     private void MonAttack()
     {
         HashSet<Tile> temp = path.Range(unitTIle, range, Pathfinder.PathMode.mA);
-        if (temp.Contains(selectPlayer))
+        atkC--;
+        if (temp.Contains(selectPlayer.unitTIle))
             Attack(selectPlayer.gameObject);
         else
         {
-            isActive = false;
-            atkC--;
+           isActive = false;
+           
 
         }
     }
@@ -80,17 +82,16 @@ public class Monster : UnitP
     {
         GameManager.instance.cam.ChangeTarget(gameObject);
         GameManager.instance.cam.ZoomIn();
-      
+        moveC--;
         List<Tile> temp = new List<Tile>();
-        Debug.Log(GameManager.instance.FIndPlayer().Count);
         temp = path.findPlayer(unitTIle , GameManager.instance.FIndPlayer());
 
-        Debug.Log(temp.Count);
-        temp[temp.Count-1] = selectPlayer;
+  
+        selectPlayer= temp[temp.Count-1].on.GetComponent<Player>();
         if(temp.Count>runAble)
             temp = temp.GetRange(0, runAble);
-        
-        while (temp.Count>0&&temp[temp.Count - 1].state!=Tile.TileState.Idle)
+        Debug.Log(temp[0].state);
+        while (temp.Count > 0 && temp[temp.Count - 1].state!=Tile.TileState.Idle)
             temp.RemoveAt(temp.Count-1);
         if (temp != null)
         {
@@ -103,22 +104,24 @@ public class Monster : UnitP
     // Update is called once per frame
     void Update()
     {
-        if (!isSelected)
-            return;
-        
         switch (state)
         {
 
             case UnitState.Idle:
                 if (hp <= 0)
                     ChangeState(UnitState.Die);
-                 ChangeState(UnitState.Move);
+                if (!isSelected)
+                    return;
+                if (atkC == 0 && moveC == 0)
+                    GameManager.instance.enemyTurnChange();
+                else
+                    ChangeState(UnitState.Move);
                 break;
             case UnitState.Move:
                 if (isActive) { return; }
                 if (moveC == 0)
                 {
-                    moveC++;
+                    //moveC++;
                     ChangeState(UnitState.Attack);
                 }
                 isActive = true;
@@ -131,7 +134,15 @@ public class Monster : UnitP
             case UnitState.Attack:
                 if (isActive) { return; }
                 isActive = true;
-                MonAttack();
+                if (atkC==0)
+                {
+                    ChangeState(UnitState.Idle);
+                }
+                else
+                    MonAttack();
+               
+                
+                
                
                 break;
         

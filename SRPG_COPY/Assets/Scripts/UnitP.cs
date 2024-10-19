@@ -52,12 +52,18 @@ public class UnitP : MonoBehaviour
     {
         up, down, left, right
     }
-    public void Reset()
+    public void GReset()
     {
         hp = maxhp;
         moveC = 1;
         atkC=1;
         state=UnitState.Idle;
+    }
+    public void TReset()
+    {
+        moveC = 1;
+        atkC = 1;
+        state = UnitState.Idle;
     }
     public void SetDirection(Direction direction)
     {
@@ -96,6 +102,7 @@ public class UnitP : MonoBehaviour
 
     public virtual void Attack(GameObject a)
     {
+        Debug.Log(a);
         a.GetComponent<UnitP>().Damaged(atk);
     }
     public virtual void Damaged(float x)
@@ -179,15 +186,26 @@ public class UnitP : MonoBehaviour
         CheckDir();
         GameManager.instance.cam.ZoomOut();
         isActive = false;
-        if (--moveC == 0)
+        if (moveC == 0)
         {
+            if (this is Player)
+            {
                 UIManager.instance.ShowBAMenu(this);
-            state = UnitState.AttackThink;
-            Debug.Log("순서확인");
-            GameManager.instance.ChangeInputMode(GameManager.InputMode.block);
+                state = UnitState.AttackThink;
+                Debug.Log("순서확인");
+                GameManager.instance.ChangeInputMode(GameManager.InputMode.block);
+            }
+            else
+            {
+                state = UnitState.Attack;
+            }
         }
-        else 
+        else
+        {
+            if (this is Player) 
             GameManager.instance.ChangeInputMode(GameManager.InputMode.Player);
+        
+        }
     }
     protected virtual void ThinkAttack()
     {
