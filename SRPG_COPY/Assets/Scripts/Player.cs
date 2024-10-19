@@ -27,21 +27,44 @@ public class Player : UnitP
    
     public override void Attack(GameObject a)
     {
-        base.Attack(a);
         atkC--;
-        Debug.Log($"플레이어가 {a}를 공격");
+        UIManager.instance.HideBMenu();
+    
+        GameManager.instance.ChangeInputMode(InputMode.block);
         foreach (Tile t in RangeTiles)
         {
             t.SetPState(Tile.PState.Idle);
         }
-        if (atkC == 0)
-        {
-            UIManager.instance.HideBMenu();
-            GameManager.instance.PlayerTurnChange();
-        }
+        base.Attack(a);
+
+        StartCoroutine(AttackAni(a));
+
         //GameManager.instance.ChangeInputMode(GameManager.InputMode.s);
 
     }
+    IEnumerator AttackAni(GameObject target)
+    {
+        Debug.Log("확인2");
+        animator.SetBool("isAttack", true);
+        target.GetComponent<UnitP>().Damaged(atk);
+        yield return new WaitForSeconds(5f);
+      
+        Debug.Log($"{gameObject}가 {target}를 공격");
+        animator.SetBool("isAttack", false);
+        UIManager.instance.HideBS();
+        if (atkC == 0)
+        {
+
+            GameManager.instance.PlayerTurnChange();
+        }
+        else
+        {
+            UIManager.instance.ShowBAMenu(this);
+        }
+    }
+
+
+   
     public override void Damaged(float x)
     {
         base.Damaged(x);  
@@ -52,13 +75,7 @@ public class Player : UnitP
       
 
     }
-    protected override void ThinkAttack()
-    {
-        
-        state = UnitState.AttackThink;
-       
-    }
-    
+
 
     public override void GetRange(Pathfinder.PathMode s)
     {
@@ -68,7 +85,7 @@ public class Player : UnitP
     }
         public void movePlayer(Tile selectTile)
       {
-        Debug.Log($"확인: {unitTIle.getX()}{unitTIle.getY()}");
+  
         unitTIle.Setstate(Tile.TileState.Idle);
         List<Tile> temp = new List<Tile>();
         temp = path.FindNext(unitTIle, selectTile, Pathfinder.PathMode.pM);

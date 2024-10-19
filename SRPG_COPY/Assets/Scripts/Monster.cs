@@ -27,20 +27,22 @@ public class Monster : UnitP
     {
         base.Attack(a);
         Vector3 p = gameObject.transform.position;
-     
-        Debug.Log($"{gameObject}가 {a}를 공격");
         StartCoroutine(AttackAni(a));
 
     }
-    private IEnumerator AttackAni(GameObject target)
+    IEnumerator AttackAni(GameObject target)
     {
+        Debug.Log("확인2");
         animator.SetBool("isAttack", true);
-        yield return new WaitForSeconds(animator.GetCurrentAnimatorClipInfo(0).Length); ;
+        target.GetComponent<UnitP>().Damaged(atk);
+        yield return new WaitForSeconds(5f);
+        Debug.Log($"{gameObject}가 {target}를 공격");
         animator.SetBool("isAttack", false);
-        GameManager.instance.TurnChange(GameManager.TurnState.playerTurn);
+        UIManager.instance.HideBS();
         isActive = false;
-     
     }
+
+
     public override void Damaged(float x)
     {
         base.Damaged(x);

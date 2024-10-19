@@ -240,7 +240,6 @@ public class GameManager : MonoBehaviour
     }
     public void Attackstart()
     {
-        Debug.Log("공격이어야할터...");
         selectPlayer.GetRange(Pathfinder.PathMode.pA);
         setGo(selectPlayer.RangeTiles);
         ChangeInputMode (GameManager.InputMode.Player);

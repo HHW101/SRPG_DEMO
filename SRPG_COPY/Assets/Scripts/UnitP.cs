@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 using static UnityEditor.Progress;
+using static UnityEngine.GraphicsBuffer;
 /* 유닛들을 조작하는 가상 클래스
  *  모든 유닛이 공유하는 움직임을 줌
  *  플레이어와 적이 차이를 느끼는 건 오버라이드 해주자
@@ -23,7 +24,7 @@ public class UnitP : MonoBehaviour
     protected float moveSpeed = 2f;
     public int runAble;
     [SerializeField]
-    private float atk =5;
+    protected float atk =5;
     [SerializeField]
     public int moveC = 1;
     [SerializeField]
@@ -102,11 +103,15 @@ public class UnitP : MonoBehaviour
 
     public virtual void Attack(GameObject a)
     {
-        Debug.Log(a);
-        a.GetComponent<UnitP>().Damaged(atk);
+        UIManager.instance.ShowBattleScene(a.GetComponent<UnitP>(), this);
+       
+        Debug.Log("확인");
+       
     }
+  
     public virtual void Damaged(float x)
     {
+        UIManager.instance.getDamage(hp, hp - x, maxhp);
         hp -= x;
     }
     public virtual void GoTo(List<Tile> t)
@@ -178,9 +183,8 @@ public class UnitP : MonoBehaviour
             unitTIle = tile;
             
         }
-        for (int i = 0; i < 2; i++) {
-            yield return new WaitForSeconds(1f);
-        }
+        yield return new WaitForSeconds(1f);
+        
         unitTIle.state = Tile.TileState.Occupied;
         unitTIle.on = gameObject;
         CheckDir();
@@ -207,10 +211,7 @@ public class UnitP : MonoBehaviour
         
         }
     }
-    protected virtual void ThinkAttack()
-    {
-
-    }
+ 
     private void CheckDir()
     {
         float rot = gameObject.transform.rotation.eulerAngles.y;

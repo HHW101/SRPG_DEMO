@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.UI;
 using TMPro;
 using UnityEngine.UI;
+using Unity.VisualScripting;
 
 public class UIManager : MonoBehaviour
 {
@@ -17,6 +18,19 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TMP_Text MHP;
     [SerializeField] private Button Bbtn;
     [SerializeField] private Slider hpS;
+    [Header("배틀씬 UI")]
+    public GameObject battleScene;
+    [SerializeField] private TMP_Text bsUnit_M;
+    [SerializeField] private TMP_Text bsHP_M;
+    [SerializeField] private TMP_Text bsskill_M;
+    [SerializeField] private TMP_Text atk_M;
+    [SerializeField] private Slider bshpS_M;
+
+    [SerializeField] private TMP_Text bsUnit_P;
+    [SerializeField] private TMP_Text bsHP_P;
+    [SerializeField] private TMP_Text bsskill_P;
+    [SerializeField] private TMP_Text atk_P;
+    [SerializeField] private Slider bshpS_P;
     private void Awake()
     {
         if (instance != null)
@@ -34,6 +48,7 @@ public class UIManager : MonoBehaviour
     {
         tile.enabled = false;
         battleMenu.SetActive(false);
+        battleScene.SetActive(false);
     }
     public void ShowTile(Tile t)
     {
@@ -54,10 +69,40 @@ public class UIManager : MonoBehaviour
     public void ShowBMenu(UnitP p) {
         battleMenu.SetActive(true);
         MHP.text = $"{p.hp}";
-        hpS.value = p.maxhp / p.hp;
+        hpS.value = p.hp / p.maxhp;
         Bbtn.GetComponentInChildren<TMP_Text>().text = "Move";
         Bbtn.onClick.RemoveAllListeners();
         Bbtn.onClick.AddListener(GameManager.instance.startmove);
+    }
+    public void ShowBattleScene(UnitP m, UnitP p)
+    {
+        battleScene.SetActive(true);
+        bsUnit_P.text = $"{p.name}";
+        bshpS_P.value = p.hp / p.maxhp;
+        bsHP_P.text = $"{p.hp}";
+        bsUnit_M.text = $"{m.name}";
+        bshpS_M.value = m.hp / m.maxhp;
+        bsHP_M.text = $"{m.hp}";
+    }
+    public void getDamage(float f,float now,float max)
+    {
+        StartCoroutine(Damage(f, now,max));
+    }
+    IEnumerator Damage(float f, float now,float max)
+    {
+
+        while (f-now>=0.01f) {
+            f -= 1f*Time.deltaTime;
+            bshpS_M.value =  f/max;
+            bsHP_M.text = $"{Mathf.Round(f)}";
+            yield return null;
+        }
+        bshpS_M.value =  f/max;
+        bsHP_M.text = $"{Mathf.Round(f)}";
+    }
+    public void HideBS()
+    {
+        battleScene.SetActive(false);
     }
     public void HideBMenu()
     {
