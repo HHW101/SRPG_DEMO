@@ -21,18 +21,20 @@ public class MTstate_P : UnitState
     public override void EnterState()
     {
         Debug.Log("MTµé¾î°¨");
+        UIManager.instance.ShowInfoMenu(player);
         Thinkmove();
     }
     public override void ExitState()
     {
-        Debug.Log("MT³ª¿È");
+        UIManager.instance.HideBMenu();
+        Debug.Log("MT");
     }
     public void Thinkmove()
     {
         // setGo(player[NowPNum].RangeTiles);
         player.GetRange(Pathfinder.PathMode.pM);
         GameManager.instance.setGo(player.RangeTiles);
-        UIManager.instance.battleMenu.SetActive(false);
+        UIManager.instance.InfoUI.SetActive(false);
         GameManager.instance.setSelect(player.unitTIle);
         GameManager.instance.ChangeInputMode(GameManager.InputMode.Player);
     }

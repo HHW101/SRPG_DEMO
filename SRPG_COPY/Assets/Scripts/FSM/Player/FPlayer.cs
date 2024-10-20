@@ -11,10 +11,7 @@ public class FPlayer : FUnit
     }
     UnitState state;
     bool isClick=false;
-    private void Awake()
-    {
-        
-    }
+  
     void Start()
     {
         fsm = new FSM(new IdleState_P(this));
@@ -66,7 +63,7 @@ public class FPlayer : FUnit
             case UnitState.AT:
                 if (IsClick())
                 {
-                    fsm.ChangeState(new ATstate_P(this));
+                    fsm.ChangeState(new AState_P(this));
                     isClick = false;
                     state = UnitState.Attack;
                 }
@@ -89,13 +86,7 @@ public class FPlayer : FUnit
         }
         fsm.DoingState();
     }
-    public void Damaged(float x)
-    {
-        UIManager.instance.getDamage(hp, hp - x, maxhp);
-        hp -= x;
-        animator.SetBool("isHit", true);
-        animator.SetBool("isHit", false);
-    }
+  
     public void getClick(Tile tile)
     {
 
@@ -104,6 +95,7 @@ public class FPlayer : FUnit
             if ((state == UnitState.MT && tile.state == Tile.TileState.Idle)||(state==UnitState.AT&&tile.on.GetComponent<FMonster>()!=null))
             {
                 selectTile = tile;
+                Debug.Log(selectTile.on);
                 isClick = true;
             }
             

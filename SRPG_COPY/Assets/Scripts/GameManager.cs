@@ -39,6 +39,7 @@ public class GameManager : MonoBehaviour
     public int turnN=0;
     //private int NowPNum =-1;
     private int NowMNum =-1;
+
     public enum TurnState
     {
         start, playerTurn, enemyTurn, end
@@ -118,15 +119,12 @@ public class GameManager : MonoBehaviour
             TurnChange(TurnState.enemyTurn);
      
     }
-    private void StartGame()
-    {
-        setSelect(selectPlayer.unitTIle);
-    }
+  
     public void getClick()
     {
         selectPlayer.getClick(selectTile);
     }
-    
+  
     public void ClickTile()
     {
         if (selectTile.on != null && selectTile.on.GetComponent<Monster>() != null)
@@ -170,6 +168,7 @@ public class GameManager : MonoBehaviour
     //}
     public void ShiftSelect(int x,int y,int mode) // 0: 맵 기준 타일 선택 1: 플레이어 기준 타일 선택
     {
+        UIManager.instance.HideInfo();
             
         int nx=selectTile.getX()+x;
         int ny=selectTile.getY()+y;
@@ -190,7 +189,7 @@ public class GameManager : MonoBehaviour
         }
         selectTile = grid[nx, ny];
         selectTile.SetPState(Tile.PState.Select);
-        UIManager.instance.ShowTile(selectTile);
+      
     }
   
     public void setGo(HashSet<Tile> tiles)
@@ -215,12 +214,13 @@ public class GameManager : MonoBehaviour
         if (IsPend()!=null)
         {
             setSelect(IsPend().unitTIle);
-            Debug.Log("순서");
+           
             ChangeInputMode(InputMode.Map);
         }
         else
         {
             TurnChange(TurnState.enemyTurn);
+            Debug.Log("적턴 시작");
             enemyTurnChange();
             //NowPNum=-1;
         }
@@ -237,15 +237,24 @@ public class GameManager : MonoBehaviour
     }
     public void SelectPlayer()
     {   
-        selectPlayer = selectTile.on.GetComponent<FPlayer>();
+         
         Debug.Log("선택");
-        if (selectPlayer != null)
+        if (selectTile.on == null)
         {
+            UIManager.instance.ShowTile(selectTile);
+        }
+        else if (selectTile.on.GetComponent<FPlayer>() != null)
+        {
+            selectPlayer = selectTile.on.GetComponent<FPlayer>();
             setSelect(selectPlayer.unitTIle);
             //  UIManager.instance.ShowBMenu(selectPlayer);
             //Debug.Log($"{NowPNum}:{player[NowPNum].RangeTiles.Count}");
             cam.ChangeTarget(selectPlayer.gameObject);
            
+        }
+        else
+        {
+            UIManager.instance.ShowMonster(selectTile.on.GetComponent<FUnit>());
         }
             //ChangeInputMode(GameManager.InputMode.Player);
         
@@ -271,14 +280,14 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            TurnChange(TurnState.playerTurn);
+            
             monster[NowMNum].isSelected = false;
             StartTurn();
             PlayerTurnChange();
             NowMNum = -1;
         }
     }
-    private void MoveTile()
+    public void MoveTile()
     {
         HashSet<Tile> goTiles = selectPlayer.RangeTiles;
         if (goTiles != null)

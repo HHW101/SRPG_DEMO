@@ -12,7 +12,7 @@ public class AState_P : UnitState
     }
     private Vector3 originPos, targetPos;
 
-    public Tile selectTile;
+ 
     // Start is called before the first frame update
     public override void DoingState()
     {
@@ -20,11 +20,15 @@ public class AState_P : UnitState
     }
     public override void EnterState()
     {
-        player.Attack(selectTile.on);
+        Debug.Log(player.selectTile);
+        GameManager.instance.MoveTile();
+        player.Attack(player.selectTile.on);
+        player.block();
+        player.atkC--;
     }
     public override void ExitState()
     {
-        //¿Ãµø
+        
     }
      public void getClick()
     {

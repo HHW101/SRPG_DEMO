@@ -443,16 +443,16 @@ MonoBehaviour:
   maxhp: 10
   hp: 10
   range: 1
-  runAble: 8
+  runAble: 5
   moveC: 1
   atkC: 1
   animator: {fileID: 0}
   moveSpeed: 2
   atk: 5
-  selectUnit: {fileID: 0}
   unitNum: 0
   unitTIle: {fileID: 0}
   dirU: 0
+  selectTile: {fileID: 0}
   isSelected: 0
   isFinish: 0
 --- !u!1 &1099011281

@@ -14,18 +14,17 @@ public class AState_M : UnitState
 
     public override void DoingState()
     {
-        if (monster.atkC > 0)
-        {
-            monster.atkC--;
-            MonAttack();
-        }
+        
     }
     public override void EnterState()
     {
+        monster.block();
         MonAttack();
+    
     }
     public override void ExitState()
     {
+        
         UIManager.instance.HideBS();
     }
 
@@ -34,9 +33,10 @@ public class AState_M : UnitState
         Pathfinder path = new Pathfinder();
         HashSet<Tile> temp = path.Range(monster.unitTIle, monster.range, Pathfinder.PathMode.mA);
         monster.atkC--;
-        if (temp.Contains(monster.selectUnit.unitTIle))
-            monster.Attack(monster.selectUnit.gameObject);
-      
+        if (temp.Contains(monster.selectTile)) 
+            monster.Attack(monster.selectTile.on.gameObject);
+        else
+             monster.UnLock();
     }
  
 

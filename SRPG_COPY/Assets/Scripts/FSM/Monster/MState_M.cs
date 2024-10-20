@@ -13,19 +13,17 @@ public class MState_M : UnitState
 
     public override void DoingState()
     {
-        if (monster.moveC > 0)
-        {
-            monster.moveC--;
-            Findplayer();
-        }
+       
     }
     public override void EnterState()
     {
         Findplayer();
+        monster.block();
+        UIManager.instance.ShowInfoMenu(monster);
     }
     public override void ExitState()
     {
-   
+        UIManager.instance.HideBMenu();
     }
     
     //방향 탐색
@@ -41,7 +39,7 @@ public class MState_M : UnitState
         temp = path.findPlayer(monster.unitTIle, GameManager.instance.FIndPlayer());
 
 
-        monster.selectUnit = temp[temp.Count - 1].on.GetComponent<FUnit>();
+        monster.selectTile = temp[temp.Count - 1];
         if (temp.Count > monster.runAble)
             temp = temp.GetRange(0, monster.runAble);
         Debug.Log(temp[0].state);

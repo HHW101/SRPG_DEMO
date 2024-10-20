@@ -24,7 +24,6 @@ public class FUnit : MonoBehaviour
     protected bool isMove;
     [SerializeField]
     public float atk = 5; //공격력
-    public FUnit selectUnit;
     public int unitNum; //유닛 이름
     public HashSet<Tile> RangeTiles = new HashSet<Tile>(); //사거리
     public Tile unitTIle; //현재 가진 올라온 타일
@@ -32,6 +31,7 @@ public class FUnit : MonoBehaviour
     public Tile selectTile;
     public bool isSelected=false;
     public bool isFinish=false;
+
     //스킬 관련
     public List<Skill> skill = new List<Skill>();
     protected FSM fsm; //유한상태머신
@@ -54,6 +54,7 @@ public class FUnit : MonoBehaviour
         atkC = 1;
     
     }
+   
     public void TReset()
     {
         moveC = 1;
@@ -103,6 +104,31 @@ public class FUnit : MonoBehaviour
 
         }
         Debug.Log($":{RangeTiles.Count}");
+    }
+    public void Damaged(float x)
+    {
+        UIManager.instance.getDamage(hp, hp - x, maxhp);
+        hp -= x;
+        StartCoroutine(wait());
+       
+    }
+    IEnumerator wait()
+    {
+        animator.SetBool("isHit", true);
+        yield return new WaitForSeconds(3);
+        animator.SetBool("isHit", false);
+    }
+    public void Dead()
+    {
+      
+        StartCoroutine(wait2());
+    }
+    IEnumerator wait2()
+    {
+        animator.SetBool("isDie", true);
+        yield return new WaitForSeconds(3);
+        animator.SetBool("isDie", false);
+        Destroy(gameObject);
     }
     public void CheckDir()
     {
@@ -161,19 +187,33 @@ public class FUnit : MonoBehaviour
     public void Attack(GameObject a)
     {
         // UIManager.instance.ShowBattleScene(a.GetComponent<UnitP>(), monster);
+        UIManager.instance.ShowBattleScene(a.GetComponent<FUnit>(),this);
         Vector3 p = gameObject.transform.position;
+        GetBattleRot(a);
         StartCoroutine(AttackAni(a));
 
+    }
+    public void GetBattleRot(GameObject a)
+    {
+        Vector3 temp = a.transform.position-transform.position;
+        transform.rotation = Quaternion.Euler(temp);
+        CheckDir();
     }
     IEnumerator AttackAni(GameObject target)
     {
         Debug.Log("확인2");
         animator.SetBool("isAttack", true);
-        target.GetComponent<UnitP>().Damaged(atk);
+        float dmg=atk;
+        if (target.GetComponent<FUnit>().dirU == dirU)
+        {
+            dmg *= 1.2f;
+            Debug.Log("백어택!");
+        }
+        target.GetComponent<FUnit>().Damaged(dmg);
         yield return new WaitForSeconds(5f);
         Debug.Log($"{gameObject}가 {target}를 공격");
         animator.SetBool("isAttack", false);
-        UnLock();
+        UnLock(); 
 
     }
     private IEnumerator MovePlayer(List<Tile> t)

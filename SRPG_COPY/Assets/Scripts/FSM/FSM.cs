@@ -31,17 +31,18 @@ public class FSM
 
         if (currentState == state)
         {
-          
             return;
         }
         if (currentState != null)
         {
             currentState.ExitState();
-            Debug.Log($"{state}나감");
+            Debug.Log($"{currentState}나감");
         }
+        
         currentState = state;
-        currentState.EnterState();
         Debug.Log($"{state}들어감");
+        currentState.EnterState();
+       
     }
 
 }

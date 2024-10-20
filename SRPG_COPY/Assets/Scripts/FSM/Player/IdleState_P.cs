@@ -20,13 +20,14 @@ public class IdleState_P : UnitState
     }
     public override void EnterState()
     {
-        Debug.Log("idle들어감");
+        if(!player.CanAttack())
+            GameManager.instance.PlayerTurnChange();
     }
     public override void ExitState()
     {
-        Debug.Log("idle나감");
+        
         GameManager.instance.ChangeInputMode(GameManager.InputMode.Player);
-        UIManager.instance.battleMenu.SetActive(true);
+        UIManager.instance.InfoUI.SetActive(true);
     }
     public void getClick()
     {

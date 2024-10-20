@@ -20,10 +20,12 @@ public class ATstate_P : UnitState
     }
     public override void EnterState()
     {
+        UIManager.instance.ShowBAMenu(player);
         ThinkAttack();
     }
     public override void ExitState()
     {
+        UIManager.instance.HideBMenu();
         //¿Ãµø
     }
     public void ThinkAttack()
