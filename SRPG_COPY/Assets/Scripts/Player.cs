@@ -59,7 +59,7 @@ public class Player : UnitP
         }
         else
         {
-            UIManager.instance.ShowBAMenu(this);
+          //  UIManager.instance.ShowBAMenu(this);
         }
     }
 

@@ -10,7 +10,7 @@ public class Monster : UnitP
 
   
     public bool isAttack = false;
-
+    private global::UnitState Mstate;
     public Player selectPlayer;
     // Start is called before the first frame update
     protected  override void  Awake()

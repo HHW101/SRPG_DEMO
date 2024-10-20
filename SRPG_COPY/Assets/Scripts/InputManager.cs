@@ -80,28 +80,30 @@ public class InputManager : MonoBehaviour
   
     public void OnClick(InputAction.CallbackContext context)
     {
+       // GameManager.instance.ClickTile();
+
         switch (GameManager.instance.inputmode)
         {
             case GameManager.InputMode.Player:
-                if (context.started) //처음 눌린 순만. performed- :계속 canceled 떨어졌을 때
-                {
+             if (context.started) //처음 눌린 순만. performed- :계속 canceled 떨어졌을 때
+             {
                     //ChangeInputMode(InputMode.Map);
-                    GameManager.instance.ClickTile();
-                }
-                break;
+                    GameManager.instance.getClick();
+              }
+               break;
             case GameManager.InputMode.Map:
                 if (context.started)
                 {
                     GameManager.instance.SelectPlayer();
-                
+                    UnityEngine.Debug.Log("클릭");
                 }
                 break;
             case GameManager.InputMode.block:
-                
+
                 break;
 
         }
-     }
+    }
     public void OnCancel(InputAction.CallbackContext context) { 
     }
     public void OnOpenMenu(InputAction.CallbackContext context)

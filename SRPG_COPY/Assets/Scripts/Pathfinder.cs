@@ -13,10 +13,7 @@ public class Pathfinder
         mA,mM,pA,pM
     }
     // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+ 
     //BFS 사용
    public HashSet<Tile> Range(Tile startTile,int cnt,PathMode mode)
     {
@@ -50,7 +47,7 @@ public class Pathfinder
                         switch (mode)
                         {
                             case PathMode.pM:
-                                if (tempTIle.on.GetComponent<Monster>() != null)
+                                if (tempTIle.on.GetComponent<FMonster>() != null)
                                 {
                                   
                                     continue;
@@ -58,7 +55,7 @@ public class Pathfinder
                                 break;
                             case PathMode.mM:
                                 {
-                                    if (tempTIle.on.GetComponent<Player>() != null)
+                                    if (tempTIle.on.GetComponent<FPlayer>() != null)
                                         continue;
                                 }
                                 break;
@@ -224,10 +221,10 @@ public class Pathfinder
 
         return 0;
     }
-    public List<Tile> findPlayer(Tile mon, List<Player> players)
+    public List<Tile> findPlayer(Tile mon, List<FPlayer> players)
     {
         List<Tile> list = new List<Tile>();
-        foreach (Player player in players) { 
+        foreach (FPlayer player in players) { 
             list.Add(player.unitTIle);
         }
         List<Tile> result = new List<Tile>();

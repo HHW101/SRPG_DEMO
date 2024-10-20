@@ -4,7 +4,7 @@ using System.Threading;
 using UnityEngine;
 using static UnityEditor.Progress;
 using static UnityEngine.GraphicsBuffer;
-/* 유닛들을 조작하는 가상 클래스
+/* 
  *  모든 유닛이 공유하는 움직임을 줌
  *  플레이어와 적이 차이를 느끼는 건 오버라이드 해주자
  * 
@@ -36,7 +36,7 @@ public class UnitP : MonoBehaviour
     protected Pathfinder path = new Pathfinder();
     public UnitState state;
     protected bool isClick=false ;
-
+    protected bool isMove=false;
     //스킬 관련
     public List<Skill> skill = new List<Skill>();
 
@@ -66,6 +66,7 @@ public class UnitP : MonoBehaviour
         atkC = 1;
         state = UnitState.Idle;
     }
+
     public void SetDirection(Direction direction)
     {
         dirU = direction;
@@ -103,7 +104,7 @@ public class UnitP : MonoBehaviour
 
     public virtual void Attack(GameObject a)
     {
-        UIManager.instance.ShowBattleScene(a.GetComponent<UnitP>(), this);
+       // UIManager.instance.ShowBattleScene(a.GetComponent<UnitP>(), this);
        
         Debug.Log("확인");
        
@@ -126,6 +127,7 @@ public class UnitP : MonoBehaviour
         StartCoroutine(MovePlayer(t));
 
     }
+
     public virtual void GetRange(Pathfinder.PathMode s)
     {
 
@@ -194,7 +196,7 @@ public class UnitP : MonoBehaviour
         {
             if (this is Player)
             {
-                UIManager.instance.ShowBAMenu(this);
+              //  UIManager.instance.ShowBAMenu(this);
                 state = UnitState.AttackThink;
                 Debug.Log("순서확인");
                 GameManager.instance.ChangeInputMode(GameManager.InputMode.block);

@@ -57,7 +57,7 @@ public class UIManager : MonoBehaviour
         tile.text = $"[{t.getX()},{t.getY()}]\n비용:{t.moveCost}";
     }
     
-    public void ShowC(UnitP p)
+    public void ShowC(FUnit p)
     {
         //switch (TurnManager.instance.turn)
         //{
@@ -66,15 +66,15 @@ public class UIManager : MonoBehaviour
         //}
     }
     
-    public void ShowBMenu(UnitP p) {
+    public void ShowBMenu(FUnit p) {
         battleMenu.SetActive(true);
         MHP.text = $"{p.hp}";
         hpS.value = p.hp / p.maxhp;
         Bbtn.GetComponentInChildren<TMP_Text>().text = "Move";
         Bbtn.onClick.RemoveAllListeners();
-        Bbtn.onClick.AddListener(GameManager.instance.startmove);
+     //   Bbtn.onClick.AddListener(GameManager.instance.startmove);
     }
-    public void ShowBattleScene(UnitP m, UnitP p)
+    public void ShowBattleScene(FUnit m, FUnit p)
     {
         battleScene.SetActive(true);
         bsUnit_P.text = $"{p.name}";
@@ -108,7 +108,7 @@ public class UIManager : MonoBehaviour
     {
         battleMenu.SetActive(false);
     }
-    public void ShowBAMenu(UnitP p)
+    public void ShowBAMenu(FUnit p)
     {
         battleMenu.SetActive(true);
         MHP.text = $"{p.hp}";

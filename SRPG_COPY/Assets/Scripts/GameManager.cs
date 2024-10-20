@@ -5,6 +5,7 @@ using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEditor.Search;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.UIElements;
 using static UnitP;
 using static UnityEngine.GraphicsBuffer;
@@ -16,18 +17,19 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int GridX =10;
     [SerializeField] private int GridY =10;
     [SerializeField] private Tile tilePre;
-    [SerializeField] private Player PlayerPre;
-    [SerializeField] private Monster MonsterPre;
+    [SerializeField] private FPlayer PlayerPre;
+    [SerializeField] private FMonster MonsterPre;
     [SerializeField] private float speed=2.0f;
     [SerializeField] private Vector2[] monspawnPos = new Vector2[5];
     [SerializeField] private Vector2[] playerPos = new Vector2[1];
     [SerializeField] private Vector2[] obspawnPos = new Vector2[5];
     [SerializeField] private GameObject obspre;
     private Tile selectTile;
-    private Player selectPlayer;
+    private FPlayer selectPlayer;
+    private FMonster selectMonster;
     public Camera cam;
-    private List<Player> player = new List<Player>();
-    private List<Monster> monster = new List<Monster>();
+    private List<FPlayer> player = new List<FPlayer>();
+    private List<FMonster> monster = new List<FMonster>();
     private int TileX;
     private int TileY;
     private bool isRunning;
@@ -69,11 +71,19 @@ public class GameManager : MonoBehaviour
     {
         turnN++;
         Debug.Log(turnN);
-        foreach(Player p in player)
+        foreach(FPlayer p in player)
             p.TReset();
-        foreach(Monster m in monster)
+        foreach(FMonster m in monster)
             m.TReset();
         TurnChange(TurnState.playerTurn);
+    }
+    public FMonster getselectMonster()
+    {
+        return monster[NowMNum];
+    }
+    public FPlayer getSelectPlayer()
+    {
+        return selectPlayer;
     }
     private void Awake()
     {
@@ -112,28 +122,37 @@ public class GameManager : MonoBehaviour
     {
         setSelect(selectPlayer.unitTIle);
     }
+    public void getClick()
+    {
+        selectPlayer.getClick(selectTile);
+    }
     
     public void ClickTile()
     {
-       
-        if (selectPlayer.state == UnitP.UnitState.MoveThink)
+        if (selectTile.on != null && selectTile.on.GetComponent<Monster>() != null)
         {
-            if (selectTile.state == Tile.TileState.Idle)
-            {
-                selectPlayer.movePlayer(selectTile);
-                selectPlayer.ChangeState(UnitP.UnitState.Move);
-                GameManager.instance.ChangeInputMode(GameManager.InputMode.block);
-            }
+            //selectPlayer.Attack(selectTile.on);
+            //selectPlayer.ChangeState(UnitP.UnitState.Attack);
+            //GameManager.instance.ChangeInputMode(GameManager.InputMode.block);
         }
-        if (selectPlayer.state == UnitP.UnitState.AttackThink)
-        {
-            if (selectTile.on != null && selectTile.on.GetComponent<Monster>() != null)
-            {
-                selectPlayer.Attack(selectTile.on);
-                //selectPlayer.ChangeState(UnitP.UnitState.Attack);
-                //GameManager.instance.ChangeInputMode(GameManager.InputMode.block);
-            }
-        }
+        //if (selectPlayer.state == UnitP.UnitState.MoveThink)
+        //{
+        //    if (selectTile.state == Tile.TileState.Idle)
+        //    {
+        //        selectPlayer.movePlayer(selectTile);
+        //        selectPlayer.ChangeState(UnitP.UnitState.Move);
+        //        GameManager.instance.ChangeInputMode(GameManager.InputMode.block);
+        //    }
+        //}
+        //if (selectPlayer.state == UnitP.UnitState.AttackThink)
+        //{
+        //    if (selectTile.on != null && selectTile.on.GetComponent<Monster>() != null)
+        //    {
+        //        selectPlayer.Attack(selectTile.on);
+        //        //selectPlayer.ChangeState(UnitP.UnitState.Attack);
+        //        //GameManager.instance.ChangeInputMode(GameManager.InputMode.block);
+        //    }
+        //}
     }
     public void setSelect(Tile t)
     {
@@ -141,7 +160,7 @@ public class GameManager : MonoBehaviour
             selectTile.SetPState(Tile.PState.Idle);
         selectTile = t;
         selectTile.SetPState(Tile.PState.Select);
-        }
+     }
     //public void goToTile(Tile tile)
     //{
     //    selectTile.SetPState(Tile.PState.Idle);
@@ -173,15 +192,7 @@ public class GameManager : MonoBehaviour
         selectTile.SetPState(Tile.PState.Select);
         UIManager.instance.ShowTile(selectTile);
     }
-    public void startmove()
-    {
-        // setGo(player[NowPNum].RangeTiles);
-        selectPlayer.GetRange(Pathfinder.PathMode.pM);
-        setGo(selectPlayer.RangeTiles);
-        UIManager.instance.battleMenu.SetActive(false);
-        setSelect(selectPlayer.unitTIle);
-        selectPlayer.ChangeState(UnitState.MoveThink);
-    }
+  
     public void setGo(HashSet<Tile> tiles)
     {
       
@@ -215,9 +226,9 @@ public class GameManager : MonoBehaviour
         }
     }
    
-    public Player IsPend()
+    public FPlayer IsPend()
     {
-        foreach(Player p in player)
+        foreach(FPlayer p in player)
         {
             if(p.moveC!=0)
                 return p;
@@ -225,18 +236,19 @@ public class GameManager : MonoBehaviour
         return null;
     }
     public void SelectPlayer()
-    {
-        
-        selectPlayer = selectTile.on.GetComponent<Player>();
-        if (selectPlayer != null&&selectPlayer.moveC!=0)
+    {   
+        selectPlayer = selectTile.on.GetComponent<FPlayer>();
+        Debug.Log("선택");
+        if (selectPlayer != null)
         {
             setSelect(selectPlayer.unitTIle);
-            UIManager.instance.ShowBMenu(selectPlayer);
+            //  UIManager.instance.ShowBMenu(selectPlayer);
             //Debug.Log($"{NowPNum}:{player[NowPNum].RangeTiles.Count}");
             cam.ChangeTarget(selectPlayer.gameObject);
-
-            ChangeInputMode(GameManager.InputMode.Player);
+           
         }
+            //ChangeInputMode(GameManager.InputMode.Player);
+        
     }
     public void Attackstart()
     {
@@ -254,7 +266,7 @@ public class GameManager : MonoBehaviour
             if(NowMNum>=0)
                 monster[NowMNum].isSelected = false;
             monster[++NowMNum].isSelected = true;
-            monster[NowMNum].isActive = false;
+            selectMonster = monster[NowMNum];
             Debug.Log($"{NowMNum}:이동");
         }
         else
@@ -352,7 +364,7 @@ public class GameManager : MonoBehaviour
             grid[x, y].on = player[i].gameObject;
             player[i].unitNum = i;
            
-            player[i].SetDirection(Monster.Direction.right);
+            player[i].SetDirection(FUnit.Direction.right);
             player[i].GReset();
         }
         setSelect(player[0].unitTIle);
@@ -370,10 +382,11 @@ public class GameManager : MonoBehaviour
 
 
     }
-    public List<Player> FIndPlayer()
+    public List<FPlayer> FIndPlayer()
     {
         return player;
     }
+
     public void SetMonster()
     {
         
@@ -389,18 +402,18 @@ public class GameManager : MonoBehaviour
             monster[i].unitNum = i;
             monster[i].GReset();
             if (x > y)
-                monster[i].SetDirection(Monster.Direction.left);
+                monster[i].SetDirection(FUnit.Direction.left);
             else
-                monster[i].SetDirection(Monster.Direction.down);
+                monster[i].SetDirection(FUnit.Direction.down);
         }
        
     }
     public void RemoveUnit(GameObject unit)
     {
         if(unit.GetComponent<Player>() != null)
-            player.Remove(unit.GetComponent<Player>());
+            player.Remove(unit.GetComponent<FPlayer>());
         else
-            monster.Remove(unit.GetComponent<Monster>());
+            monster.Remove(unit.GetComponent<FMonster>());
     }
 
 

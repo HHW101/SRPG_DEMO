@@ -25930,9 +25930,9 @@ MonoBehaviour:
   GridX: 20
   GridY: 20
   tilePre: {fileID: 4204972026169349626, guid: 5e94e347873d83d40b7d79b498ef5f53, type: 3}
-  PlayerPre: {fileID: 863427195390955492, guid: 4004c44e19a6d9947a60e5e5950e360f,
+  PlayerPre: {fileID: 3708044909495119321, guid: a3d7872b52891b54c929b881f10a1649,
     type: 3}
-  MonsterPre: {fileID: 7601691914486981240, guid: c6cfc32748fb5004aa11a1be074b5c58,
+  MonsterPre: {fileID: 5544410475161529101, guid: 2d9309fad8c190b4cad7033f84b09bf4,
     type: 3}
   speed: 2
   monspawnPos:
@@ -25942,6 +25942,7 @@ MonoBehaviour:
   - {x: 1, y: 1}
   obspawnPos: []
   obspre: {fileID: 1375754531036840, guid: 71497ec4178769a4c8cdb38563f01fc0, type: 3}
+  selectPlayer: {fileID: 0}
   cam: {fileID: 1580625422}
   turn: 0
   turnN: 0
