@@ -9,7 +9,9 @@
 목적: 알고리즘 공부를 위한 개인 작품. 모든 알고리즘은 개념만 참고하여 스스로 적용함.  
 
 영상 주소: <https://youtu.be/XyDqPr1DYVU>  
-게임 다운로드 주소 :<https://drive.google.com/file/d/1JLIWuZa6zShVQIDoRhWJJc9p17ldxeFt/view?usp=sharing>  
+
+
+게임 주소 :<https://drive.google.com/file/d/1JLIWuZa6zShVQIDoRhWJJc9p17ldxeFt/view?usp=sharing>  
 ---
 포트폴리오에 오타가 있습니다 범위 측정 방식은 DFS가 아니고 BFS입니다 너비 기반 탐색입니다. 죄송합니다.   
 
