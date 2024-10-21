@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Unity.Mathematics;
 using Unity.VisualScripting;
-using UnityEditor.Search;
+
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UIElements;
@@ -80,7 +80,7 @@ public class GameManager : MonoBehaviour
     }
     public FMonster getselectMonster()
     {
-        return monster[NowMNum];
+        return selectMonster;
     }
     public FPlayer getSelectPlayer()
     {
@@ -96,14 +96,23 @@ public class GameManager : MonoBehaviour
         instance = this;
         grid = new Tile[GridX, GridY];
         makeMap();
-        SetPlayer();
-        SetMonster();
+       
+        GameStart();
         path = new Pathfinder();
         inputmode = InputMode.Map;
     }
    void Start()
     {
-        StartTurn();  
+       
+    }
+    public void GameStart()
+    {
+        UIManager.instance.HideInfo();
+        turn=TurnState.start;
+        turnN = 0;
+        SetPlayer();
+        SetMonster();
+        StartTurn();
     }
     public void TurnChange(TurnState state)
     {
@@ -111,47 +120,24 @@ public class GameManager : MonoBehaviour
         if(state==TurnState.enemyTurn)
             ChangeInputMode(InputMode.block);
     }
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.P))
-            TurnChange(TurnState.playerTurn);
-        if (Input.GetKeyDown(KeyCode.X))
-            TurnChange(TurnState.enemyTurn);
-     
-    }
+  
   
     public void getClick()
     {
         selectPlayer.getClick(selectTile);
     }
-  
-    public void ClickTile()
+    public void getCancel()
     {
-        if (selectTile.on != null && selectTile.on.GetComponent<Monster>() != null)
+        if (selectPlayer.getCancel())
         {
-            //selectPlayer.Attack(selectTile.on);
-            //selectPlayer.ChangeState(UnitP.UnitState.Attack);
-            //GameManager.instance.ChangeInputMode(GameManager.InputMode.block);
+            MoveTile();
+            setSelect(selectPlayer.unitTIle);
+            selectPlayer = null;
+            ChangeInputMode(InputMode.Map);
+           
         }
-        //if (selectPlayer.state == UnitP.UnitState.MoveThink)
-        //{
-        //    if (selectTile.state == Tile.TileState.Idle)
-        //    {
-        //        selectPlayer.movePlayer(selectTile);
-        //        selectPlayer.ChangeState(UnitP.UnitState.Move);
-        //        GameManager.instance.ChangeInputMode(GameManager.InputMode.block);
-        //    }
-        //}
-        //if (selectPlayer.state == UnitP.UnitState.AttackThink)
-        //{
-        //    if (selectTile.on != null && selectTile.on.GetComponent<Monster>() != null)
-        //    {
-        //        selectPlayer.Attack(selectTile.on);
-        //        //selectPlayer.ChangeState(UnitP.UnitState.Attack);
-        //        //GameManager.instance.ChangeInputMode(GameManager.InputMode.block);
-        //    }
-        //}
     }
+
     public void setSelect(Tile t)
     {
         if (selectTile != null)
@@ -159,13 +145,7 @@ public class GameManager : MonoBehaviour
         selectTile = t;
         selectTile.SetPState(Tile.PState.Select);
      }
-    //public void goToTile(Tile tile)
-    //{
-    //    selectTile.SetPState(Tile.PState.Idle);
-    //    selectTile = tile;
-    //    selectTile.SetPState(Tile.PState.Select);
-    //    UIManager.instance.ShowTile(selectTile);
-    //}
+
     public void ShiftSelect(int x,int y,int mode) // 0: 맵 기준 타일 선택 1: 플레이어 기준 타일 선택
     {
         UIManager.instance.HideInfo();
@@ -213,12 +193,14 @@ public class GameManager : MonoBehaviour
         
         if (IsPend()!=null)
         {
+            selectPlayer = null;
             setSelect(IsPend().unitTIle);
            
             ChangeInputMode(InputMode.Map);
         }
         else
         {
+            selectPlayer = null;
             TurnChange(TurnState.enemyTurn);
             Debug.Log("적턴 시작");
             enemyTurnChange();
@@ -243,7 +225,7 @@ public class GameManager : MonoBehaviour
         {
             UIManager.instance.ShowTile(selectTile);
         }
-        else if (selectTile.on.GetComponent<FPlayer>() != null)
+        else if (selectTile.on.GetComponent<FPlayer>() != null&& selectTile.on.GetComponent<FPlayer>().atkC>0)
         {
             selectPlayer = selectTile.on.GetComponent<FPlayer>();
             setSelect(selectPlayer.unitTIle);
@@ -265,27 +247,43 @@ public class GameManager : MonoBehaviour
         setGo(selectPlayer.RangeTiles);
         ChangeInputMode (GameManager.InputMode.Player);
     }
+    private int GetAbleMonN()
+    {
+        int cnt = 0;
+        foreach(FMonster mon in monster)
+        {
+            if (mon.atkC > 0)
+                cnt++;
+        }
+        return cnt;
+    }
     public void enemyTurnChange()
     {
 
 
-        if (monster.Count - 1 > NowMNum)
+        if (IsMend()!=null)
         {
             //setSelect(monster[++NowMNum].unitTIle);
-            if(NowMNum>=0)
-                monster[NowMNum].isSelected = false;
-            monster[++NowMNum].isSelected = true;
-            selectMonster = monster[NowMNum];
-            Debug.Log($"{NowMNum}:이동");
+            selectMonster=IsMend();
+           
         }
         else
         {
-            
-            monster[NowMNum].isSelected = false;
+
+            selectMonster = null;
             StartTurn();
             PlayerTurnChange();
             NowMNum = -1;
         }
+    }
+    public FMonster IsMend()
+    {
+        foreach (FMonster p in monster)
+        {
+            if (p.atkC != 0)
+                return p;
+        }
+        return null;
     }
     public void MoveTile()
     {
@@ -300,7 +298,14 @@ public class GameManager : MonoBehaviour
         }
         goTiles.Clear();
     }
-   
+   public int Isgameend()
+    {
+        if (player.Count == 0)
+            return 0;
+        if(monster.Count == 0)
+            return 1;
+        return -1;
+    }
     public Tile getTile(int x, int y)
     {
         if(x< 0 || y < 0||x>=GridX||y>=GridY) return null;
@@ -362,6 +367,12 @@ public class GameManager : MonoBehaviour
     }
 
     public void SetPlayer() {
+
+        foreach (FPlayer p in player)
+        {
+            Destroy(p);
+        }
+        player.Clear();
         for (int i = 0; i <playerPos.Length; i++)
         {
 
@@ -398,7 +409,11 @@ public class GameManager : MonoBehaviour
 
     public void SetMonster()
     {
-        
+        foreach (FMonster mon in monster)
+        {
+            Destroy(mon);
+        }
+        monster.Clear();
         for (int i = 0; i < monspawnPos.Length; i++)
         {
             
@@ -419,11 +434,32 @@ public class GameManager : MonoBehaviour
     }
     public void RemoveUnit(GameObject unit)
     {
-        if(unit.GetComponent<Player>() != null)
+        if(unit.GetComponent<FPlayer>() != null)
             player.Remove(unit.GetComponent<FPlayer>());
         else
             monster.Remove(unit.GetComponent<FMonster>());
-    }
+        if(Isgameend()!=-1)
+            Gameend(Isgameend());
 
+    }
+    public void Gameend(int x)
+    {
+        TurnChange(TurnState.end);
+        foreach(FMonster m in monster)
+        {
+            m.end();
+        }
+        foreach (FPlayer p in player)
+        {
+            p.end();
+        }
+        ChangeInputMode(InputMode.block);
+        UIManager.instance.HideBS();
+        
+        if(x==0)
+            UIManager.instance.end(false);
+        else
+            UIManager.instance.end(true);
+    }
 
 }

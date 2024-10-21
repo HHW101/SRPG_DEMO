@@ -56,7 +56,10 @@ public class FMonster : FUnit
         }
         fsm.DoingState();
     }
- 
+    public void end()
+    {
+        state = UnitState.Idle;
+    }
     public bool IsActive()
     {
         if(GameManager.instance.turn==GameManager.TurnState.enemyTurn&& GameManager.instance.getselectMonster()==this)
@@ -81,6 +84,7 @@ public class DeadState_M : UnitState
     }
     public override void EnterState()
     {
+        GameManager.instance.RemoveUnit(monster.gameObject);
         monster.Dead();
     }
     public override void ExitState()

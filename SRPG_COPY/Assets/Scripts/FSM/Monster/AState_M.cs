@@ -35,7 +35,7 @@ public class AState_M : UnitState
         monster.atkC--;
         if (temp.Contains(monster.selectTile)) 
             monster.Attack(monster.selectTile.on.gameObject);
-        else
+        else 
              monster.UnLock();
     }
  

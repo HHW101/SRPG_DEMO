@@ -52,13 +52,14 @@ public class FUnit : MonoBehaviour
         hp = maxhp;
         moveC = 1;
         atkC = 1;
-    
+        selectTile = null;
     }
    
     public void TReset()
     {
         moveC = 1;
         atkC = 1;
+        selectTile = null;
     }
     public bool CanMove()
     {
@@ -81,10 +82,13 @@ public class FUnit : MonoBehaviour
     public void block()
     {
         isMove = true;
+        Debug.Log("잠기는 타이밍");
     }
     public void UnLock()
     {
+
         isMove = false;
+        Debug.Log("해제 타이밍");
     }
     public bool IsBlock()
     {
@@ -120,7 +124,7 @@ public class FUnit : MonoBehaviour
     }
     public void Dead()
     {
-      
+        unitTIle.state = Tile.TileState.Idle;
         StartCoroutine(wait2());
     }
     IEnumerator wait2()
@@ -128,7 +132,9 @@ public class FUnit : MonoBehaviour
         animator.SetBool("isDie", true);
         yield return new WaitForSeconds(3);
         animator.SetBool("isDie", false);
-        Destroy(gameObject);
+        UIManager.instance.HideBS();
+        
+        Destroy(gameObject);    
     }
     public void CheckDir()
     {
@@ -176,6 +182,7 @@ public class FUnit : MonoBehaviour
 
         }
     }
+    
     //코루틴 사용
     public virtual void GoTo(List<Tile> t)
     {
@@ -191,12 +198,11 @@ public class FUnit : MonoBehaviour
         Vector3 p = gameObject.transform.position;
         GetBattleRot(a);
         StartCoroutine(AttackAni(a));
-
     }
     public void GetBattleRot(GameObject a)
     {
         Vector3 temp = a.transform.position-transform.position;
-        transform.rotation = Quaternion.Euler(temp);
+        transform.LookAt(a.transform);
         CheckDir();
     }
     IEnumerator AttackAni(GameObject target)

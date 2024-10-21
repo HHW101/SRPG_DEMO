@@ -24,11 +24,12 @@ public class AState_P : UnitState
         GameManager.instance.MoveTile();
         player.Attack(player.selectTile.on);
         player.block();
+        Debug.Log($"{player.IsBlock()}Á¤Áö½ÃÅ´");
         player.atkC--;
     }
     public override void ExitState()
     {
-        
+        UIManager.instance.HideBS();
     }
      public void getClick()
     {

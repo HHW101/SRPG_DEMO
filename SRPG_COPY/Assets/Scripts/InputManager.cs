@@ -11,6 +11,7 @@ public class InputManager : MonoBehaviour
     private MapControl _controls;  // PlayerControls 객체 선언
     InputAction moveaction;
     InputAction clickaction;
+    InputAction cancelaction;
     // Start is called before the first frame update
     InputManager _inputManager;
     Vector2 inputM;
@@ -22,6 +23,7 @@ public class InputManager : MonoBehaviour
         _controls = new MapControl();
         moveaction = _controls.SelectTile.Move;
         clickaction = _controls.SelectTile.Click;
+        cancelaction = _controls.SelectTile.Cancel;
        
     }
 
@@ -40,6 +42,8 @@ public class InputManager : MonoBehaviour
         moveaction.performed += OnMove;
         clickaction.Enable();
         clickaction.started += OnClick;
+        cancelaction.Enable();
+        cancelaction.started += OnCancel;
        // selectaction.performed += OnCancel;
         //selectaction.performed += OnOpenMenu;
     }
@@ -104,7 +108,14 @@ public class InputManager : MonoBehaviour
 
         }
     }
-    public void OnCancel(InputAction.CallbackContext context) { 
+    public void OnCancel(InputAction.CallbackContext context) {
+        if (context.started) //처음 눌린 순만. performed- :계속 canceled 떨어졌을 때
+        {
+            UnityEngine.Debug.Log("취소");
+            //ChangeInputMode(InputMode.Map);
+            GameManager.instance.getCancel();
+        }
+       
     }
     public void OnOpenMenu(InputAction.CallbackContext context)
     {

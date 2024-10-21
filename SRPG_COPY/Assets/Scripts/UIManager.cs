@@ -1,17 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Unity.UI;
+
 using TMPro;
 using UnityEngine.UI;
-using Unity.VisualScripting;
+
 
 public class UIManager : MonoBehaviour
 {
     // Start is called before the first frame update
     [SerializeField] private TMP_Text turn;
     [SerializeField] private TMP_Text tile;
-
+    [SerializeField] private TMP_Text endT;
+    [SerializeField] private GameObject finish;
     public static UIManager instance;
     public GameObject InfoUI;
     [SerializeField] private TMP_Text MUnit;
@@ -55,6 +56,7 @@ public class UIManager : MonoBehaviour
         tile.enabled = false;
         InfoUI.SetActive(false);
         battleScene.SetActive(false);
+        finish.SetActive(false);
     }
     public void ShowTile(Tile t)
     {
@@ -77,7 +79,7 @@ public class UIManager : MonoBehaviour
         MHP.text = $"{p.hp}";
         hpS.value = p.hp / p.maxhp;
         atkT.text = $"공격기회:{p.atkC}";
-        moveT.text = $"공격기회:{p.moveC}";
+        moveT.text = $"이동기회:{p.moveC}";
         Bbtn.GetComponentInChildren<TMP_Text>().text = "Move";
         Bbtn.onClick.RemoveAllListeners();
      //   Bbtn.onClick.AddListener(GameManager.instance.startmove);
@@ -92,6 +94,7 @@ public class UIManager : MonoBehaviour
     }
     public void HideInfo()
     {
+        finish.SetActive(false);
         InfoUI.SetActive(false);
         tile.enabled = false;
     }
@@ -99,11 +102,15 @@ public class UIManager : MonoBehaviour
     {   
          camP.SetActive(true) ;
         camM.SetActive(true) ;
-        Vector3 temp = new Vector3(0f,5f,-4f);
-        camP.transform.position=p.transform.position+temp;
-        camP.transform.rotation=Quaternion.Euler(new Vector3(-p.transform.rotation.x+10,p.transform.rotation.y,p.transform.rotation.z+30));
-        camM.transform.position=m.transform.position+temp;
-        camM.transform.rotation = Quaternion.Euler(new Vector3(-m.transform.rotation.x-10, m.transform.rotation.y, m.transform.rotation.z+30));
+        Vector3 temp = new Vector3(0f,2.5f,0f);
+        camP.transform.position=p.transform.position+temp+p.transform.forward*2;
+        camP.transform.LookAt(p.transform);
+        camP.transform.rotation=Quaternion.Euler(30,0,0)*camP.transform.rotation;
+        camP.transform.position +=new Vector3(3, 0, 0);
+        camM.transform.position=m.transform.position+ temp+m.transform.forward*2;
+        camM.transform.LookAt(m.transform);
+        camM.transform.rotation = Quaternion.Euler(30, 0, 0) * camM.transform.rotation;
+        camP.transform.position += new Vector3(-3, 0, 0);
         battleScene.SetActive(true);
         bsUnit_P.text = $"{p.name}";
         bshpS_P.value = p.hp / p.maxhp;
@@ -111,6 +118,14 @@ public class UIManager : MonoBehaviour
         bsUnit_M.text = $"{m.name}";
         bshpS_M.value = m.hp / m.maxhp;
         bsHP_M.text = $"{m.hp}";
+    }
+    public void end(bool x)
+    {
+        finish.SetActive(true);
+      
+        if (x)
+            endT.text = "승리";
+        else endT.text = "패배";
     }
     public void getDamage(float f,float now,float max)
     {
@@ -144,11 +159,12 @@ public class UIManager : MonoBehaviour
         MHP.text = $"{p.hp}";
         hpS.value = p.maxhp / p.hp;
         atkT.text = $"공격기회:{p.atkC}";
-        moveT.text = $"공격기회:{p.moveC}";
+        moveT.text = $"이동기회:{p.moveC}";
         Bbtn.GetComponentInChildren<TMP_Text>().text = "Attack";
         Bbtn.onClick.RemoveAllListeners();
         Bbtn.onClick.AddListener(GameManager.instance.Attackstart);
     }
+    
     void Showturn()
     {
         switch (GameManager.instance.turn)

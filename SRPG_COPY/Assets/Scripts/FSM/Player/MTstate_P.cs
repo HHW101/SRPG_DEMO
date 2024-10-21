@@ -20,7 +20,6 @@ public class MTstate_P : UnitState
     }
     public override void EnterState()
     {
-        Debug.Log("MTµé¾î°¨");
         UIManager.instance.ShowInfoMenu(player);
         Thinkmove();
     }

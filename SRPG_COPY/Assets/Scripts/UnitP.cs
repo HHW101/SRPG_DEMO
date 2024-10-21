@@ -2,8 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
-using static UnityEditor.Progress;
-using static UnityEngine.GraphicsBuffer;
+
 /* 
  *  모든 유닛이 공유하는 움직임을 줌
  *  플레이어와 적이 차이를 느끼는 건 오버라이드 해주자
